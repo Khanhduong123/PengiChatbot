@@ -1,7 +1,8 @@
-# Hướng dẫn thiết lập và khởi động hệ thống 👋
+# PENGI CHATBOT 👋
 
-
-Open WebUI là một WebUI tự lưu trữ, dễ mở rộng và thân thiện với người dùng, được thiết kế để hoạt động hoàn toàn offline. Nó hỗ trợ các LLM runner khác nhau, bao gồm Ollama và API tương thích với OpenAI.
+PenGi ChatBot là một Web app dành cho chatbot để tư vấn tuyển sinh cho các trường Đại học ở Việt Nam. Đây là 1 sản phẩm phi lợi nhuận,
+hướng đến cộng động học sinh và phụ huynh ở VIỆT NAM nhằm giải quyết vấn đề tư vấn tuyển sinh, giải đáp thắc mắc về các trường đại học
+ở Việt Nam.
 
 ## Thiết lập môi trường
 
@@ -10,14 +11,20 @@ Open WebUI là một WebUI tự lưu trữ, dễ mở rộng và thân thiện v
 1. Tải xuống NVM for Windows: [nvm-setup.exe](https://github.com/coreybutler/nvm-windows/releases/download/1.1.12/nvm-setup.exe)
 2. Chạy file `.exe` và lưu lại từng PATH mà NVM thiết lập, nên thiết lập theo mặc định.
 3. Sau khi cài đặt, mở `cmd` và chạy `nvm`.
-4. Trong `cmd`, gõ lệnh sau để cài đặt Node.js phiên bản 21.0.0:
+4. Trong `cmd`, gõ lệnh sau để cài đặt Node.js phiên bản *21.0.0*:
    ```bash
    nvm install 21.0.0
    ```
 
 ### Back-end
-1. Khởi động anaconda prompt, tạo một env mới tên là backend theo command sau: conda create --name backend python=3.10
-2. Sau đó khởi động env backend bằng command : conda activate backend
+1. Khởi động anaconda prompt, tạo một env mới tên là backend theo command sau
+  ```bash
+  conda create --name backend python=3.10
+  ```
+2. Sau đó khởi động env backend bằng command sau
+  ```bash
+  conda activate backend
+  ```
 3. Sau đó cd đến rootfolder, tạo 1 venv ảo bằng command: 
     ```bash
     python -m venv venv
