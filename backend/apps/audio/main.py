@@ -182,7 +182,7 @@ async def update_audio_config(
         },
     }
 
-
+# chuyển đổi văn bản thành giọng nói
 @app.post("/speech")
 async def speech(request: Request, user=Depends(get_verified_user)):
     body = await request.body()
@@ -276,6 +276,7 @@ def transcribe(
             f.write(contents)
             f.close()
 
+        # cài engine vào thành model của mình, ko nó sẽ mặc định dùng Whisper_model
         if app.state.config.STT_ENGINE == "":
             whisper_kwargs = {
                 "model_size_or_path": WHISPER_MODEL,

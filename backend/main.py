@@ -273,11 +273,12 @@ class ChatCompletionMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         return_citations = False
 
+        log.info("Run middleware chat")
         if request.method == "POST" and (
             "/ollama/api/chat" in request.url.path
             or "/chat/completions" in request.url.path
         ):
-            log.debug(f"request.url.path: {request.url.path}")
+            log.info(f"request.url.path: {request.url.path}")
 
             # Read the original request body
             body = await request.body()
@@ -358,7 +359,7 @@ class ChatCompletionMiddleware(BaseHTTPMiddleware):
 
                 del data["docs"]
 
-                log.debug(f"rag_context: {rag_context}, citations: {citations}")
+                log.info(f"rag_context: {rag_context}, citations: {citations}")
 
             if context != "":
                 system_prompt = rag_template(

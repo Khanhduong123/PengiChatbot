@@ -26,7 +26,7 @@ from config import SRC_LOG_LEVELS, CHROMA_CLIENT
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["RAG"])
 
-
+#check lại cái chunk_size
 def query_doc(
     collection_name: str,
     query: str,
@@ -245,7 +245,7 @@ def get_rag_context(
     r,
     hybrid_search,
 ):
-    log.debug(f"docs: {docs} {messages} {embedding_function} {reranking_function}")
+    log.info(f"docs: {docs} {messages} {embedding_function} {reranking_function}")
     query = get_last_user_message(messages)
 
     extracted_collections = []
@@ -297,6 +297,10 @@ def get_rag_context(
     context_string = ""
 
     citations = []
+    log.info("======================================================================")
+    log.info(relevant_contexts)
+    log.info("======================================================================")
+    log.info(context)
     for context in relevant_contexts:
         try:
             if "documents" in context:
@@ -333,6 +337,8 @@ def get_model_path(model: str, update_model: bool = False):
 
     log.debug(f"model: {model}")
     log.debug(f"snapshot_kwargs: {snapshot_kwargs}")
+    print(f"model: {model}")
+    print(f"snapshot_kwargs: {snapshot_kwargs}")
 
     # Inspiration from upstream sentence_transformers
     if (
@@ -401,6 +407,7 @@ from langchain_core.retrievers import BaseRetriever
 from langchain_core.callbacks import CallbackManagerForRetrieverRun
 
 
+#retriever from chroma
 class ChromaRetriever(BaseRetriever):
     collection: Any
     embedding_function: Any
