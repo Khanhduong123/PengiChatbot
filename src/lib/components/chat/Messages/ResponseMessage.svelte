@@ -376,6 +376,8 @@
 			querySelector: '.mermaid'
 		});
 	});
+
+	console.log(message)
 </script>
 
 <CitationsModal bind:show={showCitationModal} citation={selectedCitation} />
@@ -541,6 +543,7 @@
 							{#if message.citations}
 								<div class="mt-1 mb-2 w-full flex gap-1 items-center flex-wrap">
 									{#each message.citations.reduce((acc, citation) => {
+										
 										citation.document.forEach((document, index) => {
 											const metadata = citation.metadata?.[index];
 											const id = metadata?.source ?? 'N/A';

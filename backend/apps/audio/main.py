@@ -10,6 +10,7 @@ from fastapi import (
     File,
     Form,
 )
+import speech_recognition as sr
 
 from fastapi.responses import StreamingResponse, JSONResponse, FileResponse
 
@@ -114,7 +115,7 @@ def is_mp4_audio(file_path):
     if not os.path.isfile(file_path):
         print(f"File not found: {file_path}")
         return False
-
+    
     info = mediainfo(file_path)
     if (
         info.get("codec_name") == "aac"
@@ -123,7 +124,19 @@ def is_mp4_audio(file_path):
     ):
         return True
     return False
-
+def is_webm_audio(file_path):
+    """Check if the given file is a WEBM audio file."""
+    if not os.path.isfile(file_path):
+        print(f"File not found: {file_path}")
+        return False
+    
+    info = mediainfo(file_path)
+    if (
+        info.get("format_name") == "webm"
+        and info.get("codec_type") == "audio"
+    ):
+        return True
+    return False
 
 def convert_mp4_to_wav(file_path, output_path):
     """Convert MP4 audio file to WAV format."""
@@ -131,6 +144,25 @@ def convert_mp4_to_wav(file_path, output_path):
     audio.export(output_path, format="wav")
     print(f"Converted {file_path} to {output_path}")
 
+def convert_webm_to_wav(file_path, output_path):
+    audio = AudioSegment.from_file(file_path, format="webm")
+    audio.export(output_path, format="wav")
+    print(f"Converted {file_path} to {output_path}")
+    
+def audio_to_text(audio_filename):
+    recognizer = sr.Recognizer()
+
+    print(audio_filename)
+    with sr.AudioFile(audio_filename) as source:
+        audio_data = recognizer.record(source)
+        try:
+            text = recognizer.recognize_google(audio_data, language="vi-VN")
+            print("Transcription: " + text)
+            return text
+        except sr.RequestError:
+            print("API unavailable or unresponsive")
+        except sr.UnknownValueError:
+            print("Unable to recognize speech")
 
 @app.get("/config")
 async def get_audio_config(user=Depends(get_admin_user)):
@@ -251,7 +283,7 @@ def transcribe(
     file: UploadFile = File(...),
     user=Depends(get_current_user),
 ):
-    log.info(f"file.content_type: {file.content_type}")
+    print(f"file.content_type: {file.content_type}")
 
     if file.content_type not in ["audio/mpeg", "audio/wav"]:
         raise HTTPException(
@@ -269,8 +301,11 @@ def transcribe(
         os.makedirs(file_dir, exist_ok=True)
         file_path = f"{file_dir}/{filename}"
 
-        print(filename)
-
+        # print("=========================================================================================")
+        # print(filename)
+        # print(file_path)
+        # print(file_dir)
+        # print("=========================================================================================")
         contents = file.file.read()
         with open(file_path, "wb") as f:
             f.write(contents)
@@ -315,16 +350,13 @@ def transcribe(
             print(data)
 
             return data
-
         elif app.state.config.STT_ENGINE == "openai":
-            if is_mp4_audio(file_path):
-                print("is_mp4_audio")
+            if(is_mp4_audio(file_path)):
                 os.rename(file_path, file_path.replace(".wav", ".mp4"))
                 # Convert MP4 audio file to WAV format
                 convert_mp4_to_wav(file_path.replace(".wav", ".mp4"), file_path)
 
             headers = {"Authorization": f"Bearer {app.state.config.STT_OPENAI_API_KEY}"}
-
             files = {"file": (filename, open(file_path, "rb"))}
             data = {"model": "whisper-1"}
 
@@ -365,7 +397,12 @@ def transcribe(
                     status_code=r.status_code if r != None else 500,
                     detail=error_detail,
                 )
-
+        elif app.state.config.STT_ENGINE == "google":
+            if not is_webm_audio(file_path):
+                convert_webm_to_wav(file_path, file_path)
+            data = {"text": audio_to_text(file_path)}
+            return data
+          
     except Exception as e:
         log.exception(e)
 

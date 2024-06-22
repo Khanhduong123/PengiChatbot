@@ -1040,7 +1040,7 @@ AUDIO_STT_OPENAI_API_KEY = PersistentConfig(
 AUDIO_STT_ENGINE = PersistentConfig(
     "AUDIO_STT_ENGINE",
     "audio.stt.engine",
-    os.getenv("AUDIO_STT_ENGINE", ""),
+    os.getenv("AUDIO_STT_ENGINE", "google"),
 )
 
 AUDIO_STT_MODEL = PersistentConfig(

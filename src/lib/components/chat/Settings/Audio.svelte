@@ -34,7 +34,7 @@
 	const getWebAPIVoices = () => {
 		const getVoicesLoop = setInterval(async () => {
 			voices = await speechSynthesis.getVoices();
-
+			console.log(voices)
 			// do your loop
 			if (voices.length > 0) {
 				clearInterval(getVoicesLoop);
