@@ -195,16 +195,28 @@
 			toast.success(`${model} download has been canceled`);
 		}
 	};
+	$: console.log(selectedModel)
 </script>
-
-<DropdownMenu.Root
+<div class="relative w-full">
+	<div
+	class="flex w-full text-left px-0.5 outline-none bg-transparent truncate text-lg font-semibold placeholder-gray-400 focus:outline-none"
+>
+	{#if selectedModel}
+		{selectedModel.label}
+	{:else}
+		{placeholder}
+	{/if}
+</div>
+</div>
+<!-- <DropdownMenu.Root
 	bind:open={show}
 	onOpenChange={async () => {
 		searchValue = '';
 		window.setTimeout(() => document.getElementById('model-search-input')?.focus(), 0);
 	}}
 >
-	<DropdownMenu.Trigger class="relative w-full" aria-label={placeholder}>
+
+<DropdownMenu.Trigger class="relative w-full" aria-label={placeholder}>
 		<div
 			class="flex w-full text-left px-0.5 outline-none bg-transparent truncate text-lg font-semibold placeholder-gray-400 focus:outline-none"
 		>
@@ -213,7 +225,6 @@
 			{:else}
 				{placeholder}
 			{/if}
-			<ChevronDown className=" self-center ml-2 size-3" strokeWidth="2.5" />
 		</div>
 	</DropdownMenu.Trigger>
 
@@ -304,8 +315,6 @@
 										{/each}
 									</div>
 								{/if}
-
-								<!-- {JSON.stringify(item.info)} -->
 
 								{#if item.model.owned_by === 'openai'}
 									<Tooltip content={`${'External'}`}>
@@ -465,7 +474,7 @@
 			<div class="hidden w-[32rem]" />
 		</slot>
 	</DropdownMenu.Content>
-</DropdownMenu.Root>
+</DropdownMenu.Root> -->
 
 <style>
 	.scrollbar-hidden:active::-webkit-scrollbar-thumb,

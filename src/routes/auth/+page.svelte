@@ -80,8 +80,8 @@
 			<div class=" self-center">
 				<img
 					crossorigin="anonymous"
-					src="{WEBUI_BASE_URL}/static/favicon.png"
-					class=" w-8 rounded-full"
+					src="{WEBUI_BASE_URL}/static/logo.png"
+					class="w-12 rounded-full"
 					alt="logo"
 				/>
 			</div>

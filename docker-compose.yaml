@@ -8,16 +8,16 @@ services:
     restart: unless-stopped
     image: ollama/ollama:${OLLAMA_DOCKER_TAG-latest}
 
-  open-webui:
+  pengi-chatbot:
     build:
       context: .
       args:
         OLLAMA_BASE_URL: '/ollama'
       dockerfile: Dockerfile
-    image: ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG-main}
-    container_name: open-webui
+    image: ynnub2804/pengi-chatbot
+    container_name: pengi-chatbot
     volumes:
-      - open-webui:/app/backend/data
+      - pengi-frontend:/app/backend/data
     depends_on:
       - ollama
     ports:
@@ -31,4 +31,4 @@ services:
 
 volumes:
   ollama: {}
-  open-webui: {}
+  pengi-frontend: {}

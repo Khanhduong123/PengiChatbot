@@ -71,7 +71,7 @@
 
 	let showModelSelector = true;
 
-	let selectedModels = [''];
+	let selectedModels = ['default-model'];
 	let atSelectedModel: Model | undefined;
 
 	let selectedModelIds = [];
@@ -148,16 +148,16 @@
 			currentId: null
 		};
 
-		if ($page.url.searchParams.get('models')) {
-			selectedModels = $page.url.searchParams.get('models')?.split(',');
-		} else if ($settings?.models) {
-			selectedModels = $settings?.models;
-		} else if ($config?.default_models) {
-			console.log($config?.default_models.split(',') ?? '');
-			selectedModels = $config?.default_models.split(',');
-		} else {
-			selectedModels = [''];
-		}
+		// if ($page.url.searchParams.get('models')) {
+		// 	selectedModels = $page.url.searchParams.get('models')?.split(',');
+		// } else if ($settings?.models) {
+		// 	selectedModels = $settings?.models;
+		// } else if ($config?.default_models) {
+		// 	console.log($config?.default_models.split(',') ?? '');
+		// 	selectedModels = $config?.default_models.split(',');
+		// } else {
+		// 	selectedModels = ['pengi-model'];
+		// }
 
 		if ($page.url.searchParams.get('q')) {
 			prompt = $page.url.searchParams.get('q') ?? '';

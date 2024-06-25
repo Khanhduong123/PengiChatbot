@@ -80,6 +80,12 @@
 					: ''} transition"
 				href="/workspace/playground">{$i18n.t('Playground')}</a
 			>
+			<a
+				class="min-w-fit rounded-lg p-1.5 px-3 {$page.url.pathname.includes('/workspace/roles')
+					? 'bg-gray-50 dark:bg-gray-850'
+					: ''} transition"
+				href="/workspace/roles">{$i18n.t('Roles')}</a
+			>
 		</div>
 	</div>
 

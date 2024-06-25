@@ -35,6 +35,8 @@
 
 	let showShareChatModal = false;
 	let showDownloadChatModal = false;
+
+	$:console.log(selectedModels)
 </script>
 
 <ShareChatModal bind:show={showShareChatModal} chatId={$chatId} />
