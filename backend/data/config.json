@@ -53,7 +53,7 @@
 				"content": "Check the following sentence for grammar and clarity: \"[sentence]\". Rewrite it for better readability while maintaining its original meaning."
 			}
 		],
-		"default_models": "default-model",
+		"default_models": "pengichatbot",
 		"user_permissions": {
 			"chat": {
 				"deletion": true
@@ -68,7 +68,7 @@
 			"https://api.openai.com/v1"
 		],
 		"api_keys": [
-			"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"
+			"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"
 		]
 	},
 	"ollama": {
@@ -88,5 +88,19 @@
 			"show": false
 		},
 		"jwt_expiry": "-1"
+	},
+	"rag": {
+		"embedding_engine": "openai",
+		"embedding_model": "text-embedding-ada-002",
+		"openai_api_base_url": "https://api.openai.com/v1",
+		"openai_api_key": "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",
+		"embedding_openai_batch_size": 1,
+		"pdf_extract_images": false,
+		"chunk_size": 1500,
+		"chunk_overlap": 100,
+		"template": "Use the following context as your learned knowledge, inside <context></context> XML tags.\n<context>\n    [context]\n</context>\n\nWhen answer to user:\n- If you don't know, just say that you don't know.\n- If you don't know when you are not sure, ask for clarification.\nAvoid mentioning that you obtained the information from the context.\nAnd answer according to the language of the user's question.\n\nGiven the context information, answer the query.\nQuery: [query]",
+		"top_k": 5,
+		"relevance_threshold": 0.0,
+		"enable_hybrid_search": false
 	}
 }
