@@ -294,17 +294,18 @@
 										</Tooltip>
 									</div>
 								</div>
-								<div class=" mb-1 text-xs text-gray-400 dark:text-gray-500">
+								
+								<!-- <div class=" mb-1 text-xs text-gray-400 dark:text-gray-500">
 									{$i18n.t('WebUI will make requests to')}
 									<span class=" text-gray-200">'{url}/models'</span>
-								</div>
+								</div> -->
 							{/each}
 						</div>
 					{/if}
 				</div>
 			</div>
 
-			<hr class=" dark:border-gray-850" />
+			<!-- <hr class=" dark:border-gray-850" />
 
 			<div class="pr-1.5 space-y-2">
 				<div class="flex justify-between items-center text-sm">
@@ -416,7 +417,7 @@
 						</a>
 					</div>
 				{/if}
-			</div>
+			</div> -->
 		{:else}
 			<div class="flex h-full justify-center">
 				<div class="my-auto">

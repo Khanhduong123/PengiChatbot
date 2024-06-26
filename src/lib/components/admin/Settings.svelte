@@ -157,7 +157,7 @@
 			<div class=" self-center">{$i18n.t('Documents')}</div>
 		</button>
 
-		<button
+		<!-- <button
 			class="px-2.5 py-2.5 min-w-fit rounded-lg flex-1 md:flex-none flex text-right transition {selectedTab ===
 			'web'
 				? 'bg-gray-200 dark:bg-gray-800'
@@ -179,7 +179,7 @@
 				</svg>
 			</div>
 			<div class=" self-center">{$i18n.t('Web Search')}</div>
-		</button>
+		</button> -->
 
 		<button
 			class="px-2.5 py-2.5 min-w-fit rounded-lg flex-1 md:flex-none flex text-right transition {selectedTab ===
@@ -234,7 +234,7 @@
 			<div class=" self-center">{$i18n.t('Audio')}</div>
 		</button>
 
-		<button
+		<!-- <button
 			class="px-2.5 py-2.5 min-w-fit rounded-lg flex-1 md:flex-none flex text-right transition {selectedTab ===
 			'images'
 				? 'bg-gray-200 dark:bg-gray-800'
@@ -258,9 +258,9 @@
 				</svg>
 			</div>
 			<div class=" self-center">{$i18n.t('Images')}</div>
-		</button>
+		</button> -->
 
-		<button
+		<!-- <button
 			class="px-2.5 py-2.5 min-w-fit rounded-lg flex-1 md:flex-none flex text-right transition {selectedTab ===
 			'pipelines'
 				? 'bg-gray-200 dark:bg-gray-800'
@@ -288,7 +288,7 @@
 				</svg>
 			</div>
 			<div class=" self-center">{$i18n.t('Pipelines')}</div>
-		</button>
+		</button> -->
 
 		<button
 			class="px-2.5 py-2.5 min-w-fit rounded-lg flex-1 md:flex-none flex text-right transition {selectedTab ===

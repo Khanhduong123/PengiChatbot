@@ -66,7 +66,7 @@
 			? navigator.languages[0]
 			: navigator.language || navigator.userLanguage;
 
-		initI18n(languages.includes(browserLanguage) ? browserLanguage : backendConfig?.default_locale);
+		initI18n("vi-VN");
 
 		if (backendConfig) {
 			// Save Backend Status to Store

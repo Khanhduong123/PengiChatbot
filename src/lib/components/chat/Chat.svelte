@@ -71,7 +71,7 @@
 
 	let showModelSelector = true;
 
-	let selectedModels = ['default-model'];
+	let selectedModels = [''];
 	let atSelectedModel: Model | undefined;
 
 	let selectedModelIds = [];
@@ -147,7 +147,7 @@
 			messages: {},
 			currentId: null
 		};
-
+		selectedModels = $config?.default_models.split(',')
 		// if ($page.url.searchParams.get('models')) {
 		// 	selectedModels = $page.url.searchParams.get('models')?.split(',');
 		// } else if ($settings?.models) {

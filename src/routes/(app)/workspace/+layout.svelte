@@ -65,21 +65,21 @@
 				{$i18n.t('Documents')}
 			</a>
 
-			<a
+			<!-- <a
 				class="min-w-fit rounded-lg p-1.5 px-3 {$page.url.pathname.includes('/workspace/tools')
 					? 'bg-gray-50 dark:bg-gray-850'
 					: ''} transition"
 				href="/workspace/tools"
 			>
 				{$i18n.t('Tools')}
-			</a>
+			</a> -->
 
-			<a
+			<!-- <a
 				class="min-w-fit rounded-lg p-1.5 px-3 {$page.url.pathname.includes('/workspace/playground')
 					? 'bg-gray-50 dark:bg-gray-850'
 					: ''} transition"
 				href="/workspace/playground">{$i18n.t('Playground')}</a
-			>
+			> -->
 			<a
 				class="min-w-fit rounded-lg p-1.5 px-3 {$page.url.pathname.includes('/workspace/roles')
 					? 'bg-gray-50 dark:bg-gray-850'

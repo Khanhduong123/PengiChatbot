@@ -259,7 +259,7 @@
 
 		<hr class=" dark:border-gray-850" />
 
-		<div class=" space-y-1 mb-3">
+		<!-- <div class=" space-y-1 mb-3">
 			<div class="mb-2">
 				<div class="flex justify-between items-center text-xs">
 					<div class=" text-xs font-medium">{$i18n.t('Default Model')}</div>
@@ -278,7 +278,7 @@
 					{/each}
 				</select>
 			</div>
-		</div>
+		</div> -->
 	</div>
 
 	<div class="flex justify-end text-sm font-medium">

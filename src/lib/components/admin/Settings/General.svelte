@@ -92,15 +92,15 @@
 					<Switch bind:state={adminConfig.SHOW_ADMIN_DETAILS} />
 				</div>
 
-				<div class="my-3 flex w-full items-center justify-between pr-2">
+				<!-- <div class="my-3 flex w-full items-center justify-between pr-2">
 					<div class=" self-center text-xs font-medium">{$i18n.t('Enable Community Sharing')}</div>
 
 					<Switch bind:state={adminConfig.ENABLE_COMMUNITY_SHARING} />
-				</div>
+				</div> -->
 
-				<hr class=" dark:border-gray-850 my-2" />
+				<!-- <hr class=" dark:border-gray-850 my-2" /> -->
 
-				<div class=" w-full justify-between">
+				<!-- <div class=" w-full justify-between">
 					<div class="flex w-full justify-between">
 						<div class=" self-center text-xs font-medium">{$i18n.t('JWT Expiration')}</div>
 					</div>
@@ -120,11 +120,11 @@
 							>{$i18n.t("'s', 'm', 'h', 'd', 'w' or '-1' for no expiration.")}</span
 						>
 					</div>
-				</div>
+				</div> -->
 
-				<hr class=" dark:border-gray-850 my-2" />
+				<!-- <hr class=" dark:border-gray-850 my-2" /> -->
 
-				<div class=" w-full justify-between">
+				<!-- <div class=" w-full justify-between">
 					<div class="flex w-full justify-between">
 						<div class=" self-center text-xs font-medium">{$i18n.t('Webhook URL')}</div>
 					</div>
@@ -137,7 +137,7 @@
 							bind:value={webhookUrl}
 						/>
 					</div>
-				</div>
+				</div> -->
 			</div>
 		{/if}
 	</div>
