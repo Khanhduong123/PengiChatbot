@@ -52,7 +52,16 @@
 				],
 				"content": "Check the following sentence for grammar and clarity: \"[sentence]\". Rewrite it for better readability while maintaining its original meaning."
 			}
-		]
+		],
+		"default_models": "default-model",
+		"user_permissions": {
+			"chat": {
+				"deletion": true
+			}
+		},
+		"enable_signup": true,
+		"default_user_role": "user",
+		"enable_community_sharing": false
 	},
 	"openai": {
 		"api_base_urls": [
@@ -66,5 +75,18 @@
 		"base_urls": [
 			"http://localhost:11434"
 		]
+	},
+	"model_filter": {
+		"enable": false,
+		"list": [
+			""
+		]
+	},
+	"webhook_url": "",
+	"auth": {
+		"admin": {
+			"show": false
+		},
+		"jwt_expiry": "-1"
 	}
 }
