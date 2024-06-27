@@ -148,8 +148,12 @@ def query_collection(
     k: int,
 ):
     results = []
+    log.info(f"query_collections: {collection_names}")
     for collection_name in collection_names:
+        
         try:
+            log.info(f"query_collection: {collection_name}")
+            log.info(f"query: {query}")
             result = query_doc(
                 collection_name=collection_name,
                 query=query,
@@ -159,6 +163,7 @@ def query_collection(
             results.append(result)
         except:
             pass
+    log.info(f"{results}")
     return merge_and_sort_query_results(results, k=k)
 
 
@@ -254,13 +259,15 @@ def get_rag_context(
     for doc in docs:
         context = None
 
-        collection_names = (
+        collection_names = [(
             doc["collection_names"]
             if doc["type"] == "collection"
             else [doc["collection_name"]]
-        )
-
-        collection_names = set(collection_names).difference(extracted_collections)
+        )]
+        
+        log.info(f"collection_names_1: {collection_names}")
+        # collection_names = set(collection_names).difference(extracted_collections)
+        log.info(f"collection_names_2: {collection_names}")
         if not collection_names:
             log.debug(f"skipping {doc} as it has already been extracted")
             continue
@@ -288,7 +295,7 @@ def get_rag_context(
         except Exception as e:
             log.exception(e)
             context = None
-
+        log.info(f"context: {context}")
         if context:
             relevant_contexts.append({**context, "source": doc})
 
@@ -320,7 +327,8 @@ def get_rag_context(
             log.exception(e)
 
     context_string = context_string.strip()
-
+    log.info(f"context_string: {context_string}")
+    log.info(f"citations: {citations}")
     return context_string, citations
 
 

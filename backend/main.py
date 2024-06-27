@@ -97,6 +97,15 @@ from config import (
 )
 from constants import ERROR_MESSAGES
 
+
+from apps.webui.models.documents import (
+    Documents,
+    DocumentForm,
+    DocumentUpdateForm,
+    DocumentModel,
+    DocumentResponse,
+)
+
 logging.basicConfig(stream=sys.stdout, level=GLOBAL_LOG_LEVEL)
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["MAIN"])
@@ -115,17 +124,15 @@ class SPAStaticFiles(StaticFiles):
 
 print(
     rf"""
-  ___                    __        __   _     _   _ ___ 
- / _ \ _ __   ___ _ __   \ \      / /__| |__ | | | |_ _|
-| | | | '_ \ / _ \ '_ \   \ \ /\ / / _ \ '_ \| | | || | 
-| |_| | |_) |  __/ | | |   \ V  V /  __/ |_) | |_| || | 
- \___/| .__/ \___|_| |_|    \_/\_/ \___|_.__/ \___/|___|
-      |_|                                               
-
-      
-v{VERSION} - building the best open-source AI user interface.
+     ____  _____ _   _  ____ ___    ____ _   _    _  _____ ____   ___ _____ 
+    |  _ \| ____| \ | |/ ___|_ _|  / ___| | | |  / \|_   _| __ ) / _ \_   _|
+    | |_) |  _| |  \| | |  _ | |  | |   | |_| | / _ \ | | |  _ \| | | || |  
+    |  __/| |___| |\  | |_| || |  | |___|  _  |/ ___ \| | | |_) | |_| || |  
+    |_|   |_____|_| \_|\____|___|  \____|_| |_/_/   \_\_| |____/ \___/ |_|
+        
+v{VERSION} - PengiChatbot app support for admission.
 {f"Commit: {WEBUI_BUILD_HASH}" if WEBUI_BUILD_HASH != "dev-build" else ""}
-https://github.com/open-webui/open-webui
+https://github.com/Khanhduong123/PengiChatbot
 """
 )
 
@@ -345,6 +352,30 @@ class ChatCompletionMiddleware(BaseHTTPMiddleware):
             # get relevant document
          
             # generate RAG completions
+            docs = [
+                DocumentResponse(
+                    **{
+                        **doc.model_dump(),
+                        "content": json.loads(doc.content if doc.content else "{}"),
+                    }
+                )
+                for doc in Documents.get_docs()
+            ]
+            collection_names = []
+            for doc in docs:
+                collection_names.append(doc.collection_name)
+            result = [
+                {
+                    "collection_names": doc.collection_name,
+                    "name": "All Documents",
+                    "title": "Tất cả tài liệu",
+                    "type": "collection",
+                    "upload_status": True
+                }
+                for doc in docs
+            ]
+            # generate RAG completions
+            data["docs"]=result
             
             # If docs field is present, generate RAG completions
             if "docs" in data:
@@ -363,7 +394,6 @@ class ChatCompletionMiddleware(BaseHTTPMiddleware):
                     context += ("\n" if context != "" else "") + rag_context
 
                 del data["docs"]
-
                 log.info(f"rag_context: {rag_context}, citations: {citations}")
 
             if context != "":
@@ -376,6 +406,7 @@ class ChatCompletionMiddleware(BaseHTTPMiddleware):
                 data["messages"] = add_or_update_system_message(
                     f"\n{system_prompt}", data["messages"]
                 )
+                return_citations = True
 
             modified_body_bytes = json.dumps(data).encode("utf-8")
 

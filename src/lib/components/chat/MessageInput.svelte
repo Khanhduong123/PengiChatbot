@@ -317,7 +317,7 @@
 			</div>
 
 			<div class="w-full relative">
-				{#if prompt.charAt(0) === '/'}
+				<!-- {#if prompt.charAt(0) === '/'}
 					<Prompts bind:this={promptsElement} bind:prompt bind:files />
 				{:else if prompt.charAt(0) === '#'}
 					<Documents
@@ -343,7 +343,7 @@
 							];
 						}}
 					/>
-				{/if}
+				{/if} -->
 
 				<Models
 					bind:this={modelsElement}

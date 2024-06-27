@@ -131,7 +131,7 @@
 	};
 </script>
 
-{#if prompt.charAt(0) === '@'}
+<!-- {#if prompt.charAt(0) === '@'}
 	{#if filteredModels.length > 0}
 		<div class="pl-1 pr-12 mb-3 text-left w-full absolute bottom-0 left-0 right-0">
 			<div class="flex w-full px-2">
@@ -159,9 +159,6 @@
 									{model.name}
 								</div>
 
-								<!-- <div class=" text-xs text-gray-600 line-clamp-1">
-								{doc.title}
-							</div> -->
 							</button>
 						{/each}
 					</div>
@@ -169,4 +166,4 @@
 			</div>
 		</div>
 	{/if}
-{/if}
+{/if} -->

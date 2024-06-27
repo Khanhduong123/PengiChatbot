@@ -178,7 +178,7 @@
 </script>
 
 <SettingsModal bind:show={$showSettings} />
-<ChangelogModal bind:show={$showChangelog} />
+<!-- <ChangelogModal bind:show={$showChangelog} /> -->
 
 <div class="app relative">
 	<div
