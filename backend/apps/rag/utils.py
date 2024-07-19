@@ -151,7 +151,7 @@ def query_collection(
     results = []
     log.info(f"query_collections: {collection_names}")
     for collection_name in collection_names:
-        
+
         try:
             log.info(f"query_collection: {collection_name}")
             log.info(f"query: {query}")
@@ -260,12 +260,14 @@ def get_rag_context(
     for doc in docs:
         context = None
 
-        collection_names = [(
-            doc["collection_names"]
-            if doc["type"] == "collection"
-            else [doc["collection_name"]]
-        )]
-        
+        collection_names = [
+            (
+                doc["collection_names"]
+                if doc["type"] == "collection"
+                else [doc["collection_name"]]
+            )
+        ]
+
         log.info(f"collection_names_1: {collection_names}")
         # collection_names = set(collection_names).difference(extracted_collections)
         log.info(f"collection_names_2: {collection_names}")

@@ -371,13 +371,13 @@ class ChatCompletionMiddleware(BaseHTTPMiddleware):
                     "name": "All Documents",
                     "title": "Tất cả tài liệu",
                     "type": "collection",
-                    "upload_status": True
+                    "upload_status": True,
                 }
                 for doc in docs
             ]
             # generate RAG completions
-            data["docs"]=result
-            
+            data["docs"] = result
+
             # If docs field is present, generate RAG completions
             if "docs" in data:
                 data = {**data}
