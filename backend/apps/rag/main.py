@@ -175,7 +175,8 @@ app.state.config.SERPLY_API_KEY = SERPLY_API_KEY
 app.state.config.RAG_WEB_SEARCH_RESULT_COUNT = RAG_WEB_SEARCH_RESULT_COUNT
 app.state.config.RAG_WEB_SEARCH_CONCURRENT_REQUESTS = RAG_WEB_SEARCH_CONCURRENT_REQUESTS
 
-#Update model embedding
+
+# Update model embedding
 def update_embedding_model(
     embedding_model: str,
     update_model: bool = False,
@@ -311,7 +312,7 @@ async def update_embedding_config(
         app.state.config.RAG_EMBEDDING_ENGINE = form_data.embedding_engine
         app.state.config.RAG_EMBEDDING_MODEL = form_data.embedding_model
         if app.state.config.RAG_EMBEDDING_ENGINE in ["ollama", "openai"]:
-        # if app.state.config.RAG_EMBEDDING_ENGINE in ["openai"]:
+            # if app.state.config.RAG_EMBEDDING_ENGINE in ["openai"]:
             if form_data.openai_config is not None:
                 app.state.config.OPENAI_API_BASE_URL = form_data.openai_config.url
                 app.state.config.OPENAI_API_KEY = form_data.openai_config.key
@@ -1197,6 +1198,7 @@ def scan_docs_dir(user=Depends(get_admin_user)):
             log.exception(e)
 
     return True
+
 
 @app.get("/reset/db")
 def reset_vector_db(user=Depends(get_admin_user)):

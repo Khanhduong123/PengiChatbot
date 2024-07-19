@@ -343,9 +343,9 @@ class ChatCompletionMiddleware(BaseHTTPMiddleware):
 
             # TODO
             # get relevant document
-         
+
             # generate RAG completions
-            
+
             # If docs field is present, generate RAG completions
             if "docs" in data:
                 data = {**data}
@@ -586,6 +586,7 @@ app.mount("/rag/api/v1", rag_app)
 app.mount("/api/v1", webui_app)
 
 webui_app.state.EMBEDDING_FUNCTION = rag_app.state.EMBEDDING_FUNCTION
+
 
 async def get_all_models():
     openai_models = []

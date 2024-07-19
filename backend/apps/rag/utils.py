@@ -26,7 +26,8 @@ from config import SRC_LOG_LEVELS, CHROMA_CLIENT
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["RAG"])
 
-#check lại cái chunk_size
+
+# check lại cái chunk_size
 def query_doc(
     collection_name: str,
     query: str,
@@ -407,7 +408,7 @@ from langchain_core.retrievers import BaseRetriever
 from langchain_core.callbacks import CallbackManagerForRetrieverRun
 
 
-#retriever from chroma
+# retriever from chroma
 class ChromaRetriever(BaseRetriever):
     collection: Any
     embedding_function: Any

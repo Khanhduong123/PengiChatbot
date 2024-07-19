@@ -68,7 +68,7 @@
 			"https://api.openai.com/v1"
 		],
 		"api_keys": [
-			"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"
+			"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"
 		]
 	},
 	"ollama": {
@@ -102,5 +102,24 @@
 		"top_k": 5,
 		"relevance_threshold": 0.0,
 		"enable_hybrid_search": false
+	},
+	"audio": {
+		"tts": {
+			"openai": {
+				"api_base_url": "https://api.openai.com/v1",
+				"api_key": "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"
+			},
+			"engine": "",
+			"model": "tts-1",
+			"voice": "Microsoft An - Vietnamese (Vietnam)"
+		},
+		"stt": {
+			"openai": {
+				"api_base_url": "https://api.openai.com/v1",
+				"api_key": "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"
+			},
+			"engine": "google",
+			"model": "whisper-1"
+		}
 	}
 }

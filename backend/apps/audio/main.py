@@ -115,7 +115,7 @@ def is_mp4_audio(file_path):
     if not os.path.isfile(file_path):
         print(f"File not found: {file_path}")
         return False
-    
+
     info = mediainfo(file_path)
     if (
         info.get("codec_name") == "aac"
@@ -124,19 +124,19 @@ def is_mp4_audio(file_path):
     ):
         return True
     return False
+
+
 def is_webm_audio(file_path):
     """Check if the given file is a WEBM audio file."""
     if not os.path.isfile(file_path):
         print(f"File not found: {file_path}")
         return False
-    
+
     info = mediainfo(file_path)
-    if (
-        info.get("format_name") == "webm"
-        and info.get("codec_type") == "audio"
-    ):
+    if info.get("format_name") == "webm" and info.get("codec_type") == "audio":
         return True
     return False
+
 
 def convert_mp4_to_wav(file_path, output_path):
     """Convert MP4 audio file to WAV format."""
@@ -144,11 +144,13 @@ def convert_mp4_to_wav(file_path, output_path):
     audio.export(output_path, format="wav")
     print(f"Converted {file_path} to {output_path}")
 
+
 def convert_webm_to_wav(file_path, output_path):
     audio = AudioSegment.from_file(file_path, format="webm")
     audio.export(output_path, format="wav")
     print(f"Converted {file_path} to {output_path}")
-    
+
+
 def audio_to_text(audio_filename):
     recognizer = sr.Recognizer()
 
@@ -163,6 +165,7 @@ def audio_to_text(audio_filename):
             print("API unavailable or unresponsive")
         except sr.UnknownValueError:
             print("Unable to recognize speech")
+
 
 @app.get("/config")
 async def get_audio_config(user=Depends(get_admin_user)):
@@ -213,6 +216,7 @@ async def update_audio_config(
             "MODEL": app.state.config.STT_MODEL,
         },
     }
+
 
 # chuyển đổi văn bản thành giọng nói
 @app.post("/speech")
@@ -351,7 +355,7 @@ def transcribe(
 
             return data
         elif app.state.config.STT_ENGINE == "openai":
-            if(is_mp4_audio(file_path)):
+            if is_mp4_audio(file_path):
                 os.rename(file_path, file_path.replace(".wav", ".mp4"))
                 # Convert MP4 audio file to WAV format
                 convert_mp4_to_wav(file_path.replace(".wav", ".mp4"), file_path)
@@ -402,7 +406,7 @@ def transcribe(
                 convert_webm_to_wav(file_path, file_path)
             data = {"text": audio_to_text(file_path)}
             return data
-          
+
     except Exception as e:
         log.exception(e)
 
