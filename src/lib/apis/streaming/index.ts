@@ -42,6 +42,7 @@ async function* openAIStreamToIterator(
 ): AsyncGenerator<TextStreamUpdate> {
 	while (true) {
 		const { value, done } = await reader.read();
+		console.log(value);
 		if (done) {
 			yield { done: true, value: '' };
 			break;

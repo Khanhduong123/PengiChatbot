@@ -12,7 +12,7 @@ from apps.webui.internal.db import DB
 
 import json
 
-from config import SRC_LOG_LEVELS
+from config import SRC_LOG_LEVELS, CHROMA_CLIENT
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["MODELS"])
@@ -21,9 +21,8 @@ log.setLevel(SRC_LOG_LEVELS["MODELS"])
 # Documents DB Schema
 ####################
 
-
 class Document(Model):
-    collection_name = CharField(unique=True)
+    collection_name = CharField()
     name = CharField(unique=True)
     title = TextField()
     filename = TextField()
@@ -45,9 +44,9 @@ class DocumentModel(BaseModel):
     timestamp: int  # timestamp in epoch
 
 
-####################
-# Forms
-####################
+# ####################
+# # Forms
+# ####################
 
 
 class DocumentResponse(BaseModel):
@@ -155,6 +154,42 @@ class DocumentsTable:
             return True
         except:
             return False
-
+    def get_all_collection_names(self) -> List[str]:
+        try:
+            query = Document.select(Document.collection_name).distinct()
+            return [doc.collection_name for doc in query]
+        except Exception as e:
+            log.exception(e)
+            return []
+    def get_relevant_document(self, query: str, embedding_function, k: int):
+        try:
+            query_embedding = embedding_function(query)
+            results = []
+            query_context = ""
+            
+            # for collection_name in collection_names:
+            collection = CHROMA_CLIENT.get_collection(name="PengiCollection")
+            result = collection.query(
+                query_embeddings=[query_embedding],
+                n_results=k,
+            )
+            log.info(result)
+            if 'ids' in result and 'distances' in result and 'metadatas' in result and 'documents' in result:
+                for idx, doc_id in enumerate(result['ids'][0]):
+                    metadata = result['metadatas'][0][idx]
+                    document_content = result['documents'][0][idx]
+                    
+                    query_context += document_content + "\n\n"
+                    
+                    results.append({
+                        "page": metadata['page'],
+                        "document_name": metadata['source'],
+                        "document_id": doc_id,
+                        "content": document_content,
+                    })
+            return {"context": query_context.strip(), "relevant_docs": results}
+        except Exception as e:
+            log.exception(e)
+            return None
 
 Documents = DocumentsTable(DB)

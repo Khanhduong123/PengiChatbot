@@ -305,11 +305,6 @@ def transcribe(
         os.makedirs(file_dir, exist_ok=True)
         file_path = f"{file_dir}/{filename}"
 
-        # print("=========================================================================================")
-        # print(filename)
-        # print(file_path)
-        # print(file_dir)
-        # print("=========================================================================================")
         contents = file.file.read()
         with open(file_path, "wb") as f:
             f.write(contents)
@@ -363,8 +358,6 @@ def transcribe(
             headers = {"Authorization": f"Bearer {app.state.config.STT_OPENAI_API_KEY}"}
             files = {"file": (filename, open(file_path, "rb"))}
             data = {"model": "whisper-1"}
-
-            print(files, data)
 
             r = None
             try:

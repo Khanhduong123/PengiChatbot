@@ -34,6 +34,7 @@ from langchain_community.document_loaders import (
     UnstructuredPowerPointLoader,
     YoutubeLoader,
     OutlookMessageLoader,
+    UnstructuredFileLoader
 )
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
@@ -924,7 +925,7 @@ def store_docs_in_vector_db(docs, collection_name, overwrite: bool = False) -> b
                     log.info(f"deleting existing collection {collection_name}")
                     CHROMA_CLIENT.delete_collection(name=collection_name)
 
-        collection = CHROMA_CLIENT.create_collection(name=collection_name)
+        collection = CHROMA_CLIENT.get_or_create_collection(name=collection_name,metadata={"hnsw:space": "cosine"})
 
         embedding_func = get_embedding_function(
             app.state.config.RAG_EMBEDDING_ENGINE,
@@ -954,7 +955,53 @@ def store_docs_in_vector_db(docs, collection_name, overwrite: bool = False) -> b
             return True
 
         return False
+    
 
+def read_split_document(file_path):
+    # Extract the document name from the file path
+    document_name = os.path.basename(file_path)
+
+    # Choose the appropriate loader
+
+    loader = (
+        UnstructuredFileLoader(file_path)
+        if file_path.lower().endswith(".pdf")
+        else Docx2txtLoader(file_path)
+    )
+
+    # Load and split the document using the selected loader
+    documents = loader.load_and_split()
+
+
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=CHUNK_SIZE,
+        chunk_overlap=CHUNK_OVERLAP,
+    )
+
+    # Split the documents into chunks and create a list of dictionaries
+    list_chunks = [
+        {
+            "document_id": document_id,
+            "content": doc.page_content,
+            "document_name": document_name,
+            "page": doc.metadata["page"] + 1 if "page" in doc.metadata else 0,
+        }
+        for doc in text_splitter.split_documents(documents)
+    ]
+
+    return list_chunks
+async def save_document(file):
+    # Construct the full file path based on the settings
+    file_path = f"{UPLOAD_DIR}/{file.filename}"
+
+    # Read the contents of the uploaded file asynchronously
+    contents = await file.read()
+
+    # Write the uploaded contents to the specified file path
+    with open(file_path, "wb") as f:
+        f.write(contents)
+
+    return file_path
 
 def get_loader(filename: str, file_content_type: str, file_path: str):
     file_ext = filename.split(".")[-1].lower()
@@ -1052,32 +1099,36 @@ def get_loader(filename: str, file_content_type: str, file_path: str):
 
 
 @app.post("/doc")
-def store_doc(
+async def store_doc(
     collection_name: Optional[str] = Form(None),
     file: UploadFile = File(...),
     user=Depends(get_current_user),
 ):
     # "https://www.gutenberg.org/files/1727/1727-h/1727-h.htm"
-
+    collection_name = "PengiCollection"
     log.info(f"file.content_type: {file.content_type}")
     try:
-        unsanitized_filename = file.filename
-        filename = os.path.basename(unsanitized_filename)
+        file_path = await save_document(file=file)
+        list_chunks = read_split_document(
+            file_path=file_path
+        )
+        # unsanitized_filename = file.filename
+        # filename = os.path.basename(unsanitized_filename)
 
-        file_path = f"{UPLOAD_DIR}/{filename}"
+        # file_path = f"{UPLOAD_DIR}/{filename}"
 
-        contents = file.file.read()
-        with open(file_path, "wb") as f:
-            f.write(contents)
-            f.close()
+        # contents = file.file.read()
+        # with open(file_path, "wb") as f:
+        #     f.write(contents)
+        #     f.close()
 
-        f = open(file_path, "rb")
-        if collection_name == None:
-            collection_name = calculate_sha256(f)[:63]
-        f.close()
+        # f = open(file_path, "rb")
+        # if collection_name == None:
+        #     collection_name = calculate_sha256(f)[:63]
+        # f.close()
 
-        loader, known_type = get_loader(filename, file.content_type, file_path)
-        data = loader.load()
+        # loader, known_type = get_loader(filename, file.content_type, file_path)
+        # data = loader.load()
 
         try:
             result = store_data_in_vector_db(data, collection_name)

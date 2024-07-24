@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request, Response, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse, FileResponse
 
+from langchain_openai import ChatOpenAI
 import requests
 import aiohttp
 import asyncio
@@ -13,6 +14,9 @@ from starlette.background import BackgroundTask
 
 from apps.webui.models.models import Models
 from apps.webui.models.users import Users
+from apps.openai.chains.condense_question import CondenseQuestionChain
+from apps.openai.chains.generate_answer import GenerateAnswerChain
+from apps.openai.prompts.generate_answer import GENERATE_ANSWER_PROMPT
 from constants import ERROR_MESSAGES
 from utils.utils import (
     decode_token,
@@ -20,6 +24,17 @@ from utils.utils import (
     get_verified_user,
     get_admin_user,
 )
+from apps.webui.models.documents import (
+    Documents,
+    DocumentForm,
+    DocumentUpdateForm,
+    DocumentModel,
+    DocumentResponse,
+)
+from utils.misc import get_last_user_message, add_or_update_system_message
+from apps.rag.main import app as rag_app
+from apps.rag.utils import get_rag_context, rag_template, query_doc
+
 from config import (
     SRC_LOG_LEVELS,
     ENABLE_OPENAI_API,
@@ -30,11 +45,12 @@ from config import (
     MODEL_FILTER_LIST,
     AppConfig,
 )
-from typing import List, Optional
+from typing import AsyncIterable, List, Optional
 
 
 import hashlib
 from pathlib import Path
+from apps.openai.config import chat_config
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["OPENAI"])
@@ -60,6 +76,10 @@ app.state.config.OPENAI_API_KEYS = OPENAI_API_KEYS
 
 app.state.MODELS = {}
 
+
+condense_question_chain = CondenseQuestionChain(app.state.config.OPENAI_API_KEYS[app.state.config.OPENAI_API_BASE_URLS.index("https://api.openai.com/v1")])
+generate_answer_chain = GenerateAnswerChain(app.state.config.OPENAI_API_KEYS[app.state.config.OPENAI_API_BASE_URLS.index("https://api.openai.com/v1")])
+generate_streaming_chain = GENERATE_ANSWER_PROMPT | ChatOpenAI( model=chat_config.MODEL_GPT,verbose=True,temperature=0.7, api_key=app.state.config.OPENAI_API_KEYS[app.state.config.OPENAI_API_BASE_URLS.index("https://api.openai.com/v1")])
 
 @app.middleware("http")
 async def check_url(request: Request, call_next):
@@ -199,6 +219,7 @@ async def cleanup_response(
     response: Optional[aiohttp.ClientResponse],
     session: Optional[aiohttp.ClientSession],
 ):
+    log.info("Response cleanup: ", response)
     if response:
         response.close()
     if session:
@@ -343,150 +364,215 @@ async def get_models(url_idx: Optional[int] = None, user=Depends(get_current_use
                 status_code=r.status_code if r else 500,
                 detail=error_detail,
             )
+        
+async def get_answer(form_data: dict):
+        question=get_last_user_message(form_data.get("messages"))
+        question = await condense_question_chain.run(
+            conversation_history=form_data.get("messages"), question=question
+        )
+        log.info(f"Condense question: {question}")
 
+
+        query_result = Documents.get_relevant_document(
+                question,
+                rag_app.state.EMBEDDING_FUNCTION,
+                rag_app.state.config.TOP_K
+        )
+        # log.info(f"query_result: {query_result}")
+        
+        answer = await generate_answer_chain.run(
+            context=query_result["context"], question=question
+        )
+        log.info(f"Answer: {answer}")
+        if "no answer" in answer.lower():
+            answer = chat_config.PROMPT_NOT_FOUND
+            relevant_docs = []
+
+        else:
+            relevant_docs = query_result["relevant_docs"]
+        
+        log.info(f"Answer: {answer}")
+
+        return {"question": question, "answer": answer, "relevant_docs": relevant_docs}
+async def get_answer_streaming(
+        form_data: dict
+    ) -> AsyncIterable[str]:
+        question = get_last_user_message(form_data.get("messages"))
+        question = await condense_question_chain.run(
+            conversation_history=form_data.get("messages"), question=question
+        )
+        log.info(f"Condense question: {question}")
+
+
+        query_result = Documents.get_relevant_document(
+                question,
+                rag_app.state.EMBEDDING_FUNCTION,
+                rag_app.state.config.TOP_K
+        )
+        # log.info(f"query_result: {query_result}")
+        
+        answer = ""
+        async for stream in generate_streaming_chain.astream(
+            {"context": query_result["context"], "question": question}
+        ):
+           
+            answer += str(stream.content)
+            yield str(stream.content)
+
+        relevant_docs = query_result["relevant_docs"]
+        
+        log.info(f"Answer: {answer}")
 
 @app.post("/chat/completions")
 @app.post("/chat/completions/{url_idx}")
 async def generate_chat_completion(
     form_data: dict,
     url_idx: Optional[int] = None,
-    user=Depends(get_verified_user),
-):
-    idx = 0
-    payload = {**form_data}
+    user=Depends(get_verified_user)
+): 
+    # log.info(f"form_data: {form_data}")
+    # idx = 0
+    # payload = {**form_data}
 
-    model_id = form_data.get("model")
-    model_info = Models.get_model_by_id(model_id)
+    # model_id = form_data.get("model")
+    # model_info = Models.get_model_by_id(model_id)
 
-    if model_info:
-        if model_info.base_model_id:
-            payload["model"] = model_info.base_model_id
+    # if model_info:
+    #     if model_info.base_model_id:
+    #         payload["model"] = model_info.base_model_id
 
-        model_info.params = model_info.params.model_dump()
+    #     model_info.params = model_info.params.model_dump()
 
-        if model_info.params:
-            if model_info.params.get("temperature", None) is not None:
-                payload["temperature"] = float(model_info.params.get("temperature"))
+    #     if model_info.params:
+    #         if model_info.params.get("temperature", None) is not None:
+    #             payload["temperature"] = float(model_info.params.get("temperature"))
 
-            if model_info.params.get("top_p", None):
-                payload["top_p"] = int(model_info.params.get("top_p", None))
+    #         if model_info.params.get("top_p", None):
+    #             payload["top_p"] = int(model_info.params.get("top_p", None))
 
-            if model_info.params.get("max_tokens", None):
-                payload["max_tokens"] = int(model_info.params.get("max_tokens", None))
+    #         if model_info.params.get("max_tokens", None):
+    #             payload["max_tokens"] = int(model_info.params.get("max_tokens", None))
 
-            if model_info.params.get("frequency_penalty", None):
-                payload["frequency_penalty"] = int(
-                    model_info.params.get("frequency_penalty", None)
-                )
+    #         if model_info.params.get("frequency_penalty", None):
+    #             payload["frequency_penalty"] = int(
+    #                 model_info.params.get("frequency_penalty", None)
+    #             )
 
-            if model_info.params.get("seed", None):
-                payload["seed"] = model_info.params.get("seed", None)
+    #         if model_info.params.get("seed", None):
+    #             payload["seed"] = model_info.params.get("seed", None)
 
-            if model_info.params.get("stop", None):
-                payload["stop"] = (
-                    [
-                        bytes(stop, "utf-8").decode("unicode_escape")
-                        for stop in model_info.params["stop"]
-                    ]
-                    if model_info.params.get("stop", None)
-                    else None
-                )
+    #         if model_info.params.get("stop", None):
+    #             payload["stop"] = (
+    #                 [
+    #                     bytes(stop, "utf-8").decode("unicode_escape")
+    #                     for stop in model_info.params["stop"]
+    #                 ]
+    #                 if model_info.params.get("stop", None)
+    #                 else None
+    #             )
 
-        if model_info.params.get("system", None):
-            # Check if the payload already has a system message
-            # If not, add a system message to the payload
-            if payload.get("messages"):
-                for message in payload["messages"]:
-                    if message.get("role") == "system":
-                        message["content"] = (
-                            model_info.params.get("system", None) + message["content"]
-                        )
-                        break
-                else:
-                    payload["messages"].insert(
-                        0,
-                        {
-                            "role": "system",
-                            "content": model_info.params.get("system", None),
-                        },
-                    )
+    #     if model_info.params.get("system", None):
+    #         # Check if the payload already has a system message
+    #         # If not, add a system message to the payload
+    #         if payload.get("messages"):
+    #             for message in payload["messages"]:
+    #                 if message.get("role") == "system":
+    #                     message["content"] = (
+    #                         model_info.params.get("system", None) + message["content"]
+    #                     )
+    #                     break
+    #             else:
+    #                 payload["messages"].insert(
+    #                     0,
+    #                     {
+    #                         "role": "system",
+    #                         "content": model_info.params.get("system", None),
+    #                     },
+    #                 )
 
-    else:
-        pass
+    # else:
+    #     pass
 
-    model = app.state.MODELS[payload.get("model")]
-    idx = model["urlIdx"]
+    # model = app.state.MODELS[payload.get("model")]
+    # idx = model["urlIdx"]
 
-    if "pipeline" in model and model.get("pipeline"):
-        payload["user"] = {"name": user.name, "id": user.id}
+    # if "pipeline" in model and model.get("pipeline"):
+    #     payload["user"] = {"name": user.name, "id": user.id}
 
-    # Check if the model is "gpt-4-vision-preview" and set "max_tokens" to 4000
-    # This is a workaround until OpenAI fixes the issue with this model
-    if payload.get("model") == "gpt-4-vision-preview":
-        if "max_tokens" not in payload:
-            payload["max_tokens"] = 4000
-        log.debug("Modified payload:", payload)
+    # # Check if the model is "gpt-4-vision-preview" and set "max_tokens" to 4000
+    # # This is a workaround until OpenAI fixes the issue with this model
+    # if payload.get("model") == "gpt-4-vision-preview":
+    #     if "max_tokens" not in payload:
+    #         payload["max_tokens"] = 4000
+    #     log.debug("Modified payload:", payload)
 
-    # Convert the modified body back to JSON
-    payload = json.dumps(payload)
+    # # Convert the modified body back to JSON
+    # payload = json.dumps(payload)
 
-    print(payload)
+    # print(payload)
 
-    url = app.state.config.OPENAI_API_BASE_URLS[idx]
-    key = app.state.config.OPENAI_API_KEYS[idx]
+    # url = app.state.config.OPENAI_API_BASE_URLS[idx]
+    # key = app.state.config.OPENAI_API_KEYS[idx]
 
-    print(payload)
+    # print(payload)
 
-    headers = {}
-    headers["Authorization"] = f"Bearer {key}"
-    headers["Content-Type"] = "application/json"
+    # headers = {}
+    # headers["Authorization"] = f"Bearer {key}"
+    # headers["Content-Type"] = "application/json"
 
-    r = None
-    session = None
-    streaming = False
+    # r = None
+    # session = None
+    # streaming = False
 
     try:
-        session = aiohttp.ClientSession(trust_env=True)
-        r = await session.request(
-            method="POST",
-            url=f"{url}/chat/completions",
-            data=payload,
-            headers=headers,
-        )
+        # generator = get_answer_streaming(form_data)
+        
+        # return StreamingResponse(generator, media_type="text/event-stream")
+        result = await get_answer(form_data)
+        return result
 
-        r.raise_for_status()
+        # session = aiohttp.ClientSession(trust_env=True)
+        # r = await session.request(
+        #     method="POST",
+        #     url=f"{url}/chat/completions",
+        #     data=payload,
+        #     headers=headers,
+        # )
 
+        # r.raise_for_status()
+
+      
         # Check if response is SSE
-        if "text/event-stream" in r.headers.get("Content-Type", ""):
-            streaming = True
-            return StreamingResponse(
-                r.content,
-                status_code=r.status,
-                headers=dict(r.headers),
-                background=BackgroundTask(
-                    cleanup_response, response=r, session=session
-                ),
-            )
-        else:
-            response_data = await r.json()
-            return response_data
+        # if "text/event-stream" in r.headers.get("Content-Type", ""):
+        #     streaming = True
+        #     return StreamingResponse(
+        #         r.content,
+        #         status_code=r.status,
+        #         headers=dict(r.headers),
+        #         background=BackgroundTask(
+        #             cleanup_response, response=r, session=session
+        #         ),
+        #     )
+        # else:
+        #     response_data = await r.json()
+        #     return response_data
     except Exception as e:
         log.exception(e)
         error_detail = "Open WebUI: Server Connection Error"
-        if r is not None:
-            try:
-                res = await r.json()
-                print(res)
-                if "error" in res:
-                    error_detail = f"External: {res['error']['message'] if 'message' in res['error'] else res['error']}"
-            except:
-                error_detail = f"External: {e}"
-        raise HTTPException(status_code=r.status if r else 500, detail=error_detail)
-    finally:
-        if not streaming and session:
-            if r:
-                r.close()
-            await session.close()
+        # if r is not None:
+        #     try:
+        #         res = await r.json()
+        #         print(res)
+        #         if "error" in res:
+        #             error_detail = f"External: {res['error']['message'] if 'message' in res['error'] else res['error']}"
+        #     except:
+        #         error_detail = f"External: {e}"
+        raise HTTPException(detail=error_detail)
+    # finally:
+    #     if not streaming and session:
+    #         if r:
+    #             r.close()
+    #         await session.close()
 
 
 @app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])

@@ -171,7 +171,7 @@ CHANGELOG = changelog_json
 # WEBUI_BUILD_HASH
 ####################################
 
-WEBUI_BUILD_HASH = os.environ.get("WEBUI_BUILD_HASH", "dev-build")
+WEBUI_BUILD_HASH = os.environ.get("WEBUI_BUILD_HASH", "pengi-build")
 
 ####################################
 # DATA/FRONTEND BUILD DIR
@@ -834,7 +834,7 @@ else:
     DEVICE_TYPE = "cpu"
 
 CHUNK_SIZE = PersistentConfig(
-    "CHUNK_SIZE", "rag.chunk_size", int(os.environ.get("CHUNK_SIZE", "1500"))
+    "CHUNK_SIZE", "rag.chunk_size", int(os.environ.get("CHUNK_SIZE", "100"))
 )
 CHUNK_OVERLAP = PersistentConfig(
     "CHUNK_OVERLAP",

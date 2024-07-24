@@ -26,8 +26,9 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
+ENV GENERATE_SOURCEMAP=false
 ENV APP_BUILD_HASH=${BUILD_HASH}
-RUN npm run build
+RUN npm run s-build
 
 ######## WebUI backend ########
 FROM python:3.11-slim-bookworm as base
@@ -43,13 +44,13 @@ ARG GID
 
 ## Basis ##
 ENV ENV=prod \
-    PORT=8080 \
+    PORT=9999
     # pass build args to the build
-    USE_OLLAMA_DOCKER=${USE_OLLAMA} \
-    USE_CUDA_DOCKER=${USE_CUDA} \
-    USE_CUDA_DOCKER_VER=${USE_CUDA_VER} \
-    USE_EMBEDDING_MODEL_DOCKER=${USE_EMBEDDING_MODEL} \
-    USE_RERANKING_MODEL_DOCKER=${USE_RERANKING_MODEL}
+    # USE_OLLAMA_DOCKER=${USE_OLLAMA} \
+    # USE_CUDA_DOCKER=${USE_CUDA} \
+    # USE_CUDA_DOCKER_VER=${USE_CUDA_VER} \
+    # USE_EMBEDDING_MODEL_DOCKER=${USE_EMBEDDING_MODEL} \
+    # USE_RERANKING_MODEL_DOCKER=${USE_RERANKING_MODEL}
 
 ## Basis URL Config ##
 ENV OLLAMA_BASE_URL="/ollama" \
@@ -149,7 +150,7 @@ COPY --chown=$UID:$GID ./backend .
 
 EXPOSE 8080
 
-HEALTHCHECK CMD curl --silent --fail http://localhost:8080/health | jq -e '.status == true' || exit 1
+HEALTHCHECK CMD curl --silent --fail http://localhost:9999/health | jq -e '.status == true' || exit 1
 
 USER $UID:$GID
 

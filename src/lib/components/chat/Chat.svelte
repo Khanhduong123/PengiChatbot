@@ -607,16 +607,16 @@
 		scrollToBottom();
 
 		const messagesBody = [
-			$settings.system || (responseMessage?.userContext ?? null)
-				? {
-						role: 'system',
-						content: `${promptTemplate($settings?.system ?? '', $user.name)}${
-							responseMessage?.userContext ?? null
-								? `\n\nUser Context:\n${(responseMessage?.userContext ?? []).join('\n')}`
-								: ''
-						}`
-				  }
-				: undefined,
+			// $settings.system || (responseMessage?.userContext ?? null)
+			// 	? {
+			// 			role: 'system',
+			// 			content: `${promptTemplate($settings?.system ?? '', $user.name)}${
+			// 				responseMessage?.userContext ?? null
+			// 					? `\n\nUser Context:\n${(responseMessage?.userContext ?? []).join('\n')}`
+			// 					: ''
+			// 			}`
+			// 	  }
+			// 	: undefined,
 			...messages
 		]
 			.filter((message) => message?.content?.trim())
@@ -851,11 +851,11 @@
 			scrollToBottom();
 		}
 
-		if (messages.length == 2 && messages.at(1).content !== '') {
-			window.history.replaceState(history.state, '', `/c/${_chatId}`);
-			const _title = await generateChatTitle(userPrompt);
-			await setChatTitle(_chatId, _title);
-		}
+		// if (messages.length == 2 && messages.at(1).content !== '') {
+		// 	window.history.replaceState(history.state, '', `/c/${_chatId}`);
+		// 	const _title = await generateChatTitle(userPrompt);
+		// 	await setChatTitle(_chatId, _title);
+		// }
 
 		return _response;
 	};
@@ -900,16 +900,16 @@
 							  }
 							: undefined,
 					messages: [
-						$settings.system || (responseMessage?.userContext ?? null)
-							? {
-									role: 'system',
-									content: `${promptTemplate($settings?.system ?? '', $user.name)}${
-										responseMessage?.userContext ?? null
-											? `\n\nUser Context:\n${(responseMessage?.userContext ?? []).join('\n')}`
-											: ''
-									}`
-							  }
-							: undefined,
+						// $settings.system || (responseMessage?.userContext ?? null)
+						// 	? {
+						// 			role: 'system',
+						// 			content: `${promptTemplate($settings?.system ?? '', $user.name)}${
+						// 				responseMessage?.userContext ?? null
+						// 					? `\n\nUser Context:\n${(responseMessage?.userContext ?? []).join('\n')}`
+						// 					: ''
+						// 			}`
+						// 	  }
+						// 	: undefined,
 						...messages
 					]
 						.filter((message) => message?.content?.trim())
@@ -968,6 +968,7 @@
 			scrollToBottom();
 
 			if (res && res.ok && res.body) {
+				console.log('res', res);
 				const textStream = await createOpenAITextStream(res.body, $settings.splitLargeChunks);
 				let lastUsage = null;
 
@@ -1061,12 +1062,12 @@
 			scrollToBottom();
 		}
 
-		if (messages.length == 2) {
-			window.history.replaceState(history.state, '', `/c/${_chatId}`);
+		// if (messages.length == 2) {
+		// 	window.history.replaceState(history.state, '', `/c/${_chatId}`);
 
-			const _title = await generateChatTitle(userPrompt);
-			await setChatTitle(_chatId, _title);
-		}
+		// 	const _title = await generateChatTitle(userPrompt);
+		// 	await setChatTitle(_chatId, _title);
+		// }
 
 		return _response;
 	};

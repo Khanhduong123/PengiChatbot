@@ -1,4 +1,14 @@
 services:
+  nginx:
+      image: nginx:latest
+      restart: unless-stopped
+      tty: true
+      volumes:
+        - ./nginx.conf:/etc/nginx/conf.d/my-app.conf
+      ports:
+        - "80:80"
+      depends_on:
+        - pengi-chatbot
   ollama:
     volumes:
       - ollama:/root/.ollama
@@ -9,19 +19,14 @@ services:
     image: ollama/ollama:${OLLAMA_DOCKER_TAG-latest}
 
   pengi-chatbot:
-    build:
-      context: .
-      args:
-        OLLAMA_BASE_URL: '/ollama'
-      dockerfile: Dockerfile
-    image: ynnub2804/pengi-chatbot
+    image: khanhduong2003/pengi-chatbot
     container_name: pengi-chatbot
     volumes:
       - pengi-frontend:/app/backend/data
     depends_on:
       - ollama
     ports:
-      - ${OPEN_WEBUI_PORT-3000}:8080
+      - 9999:9999
     environment:
       - 'OLLAMA_BASE_URL=http://ollama:11434'
       - 'WEBUI_SECRET_KEY='
