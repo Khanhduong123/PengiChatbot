@@ -652,7 +652,7 @@ TITLE_GENERATION_PROMPT_TEMPLATE = PersistentConfig(
         """Here is the query:
 {{prompt:middletruncate:8000}}
 
-Create a concise, 3-5 word phrase with an emoji as a title for the previous query. Suitable Emojis for the summary can be used to enhance understanding but avoid quotation marks or special formatting. RESPOND ONLY WITH THE TITLE TEXT.
+Create a concise, 3-5 word phrase with an emoji as a title for the previous query. Suitable Emojis for the summary can be used to enhance understanding but avoid quotation marks or special formatting. RESPOND ONLY WITH THE TITLE TEXT and answer questions in VIETNAMESE.
 
 Examples of titles:
 📉 Stock Market Trends
@@ -842,19 +842,27 @@ CHUNK_OVERLAP = PersistentConfig(
     int(os.environ.get("CHUNK_OVERLAP", "100")),
 )
 
-DEFAULT_RAG_TEMPLATE = """Use the following context as your learned knowledge, inside <context></context> XML tags.
+DEFAULT_RAG_TEMPLATE = """
+Use the following context as your learned knowledge, inside <context></context> XML tags.
 <context>
     [context]
 </context>
 
+Use the following history as your relearned knowledge base on context, inside <history></history> XML tags.
+<history>
+    [history]
+</history>
+
 When answer to user:
+- If message in history have annotation with rating equal -1, it means your answer is bad. And you will answer it again base on the reason and comment. And if you don't have the reason and comment in the annotation, you still have to answer it again.
 - If you don't know, just say that you don't know.
 - If you don't know when you are not sure, ask for clarification.
 Avoid mentioning that you obtained the information from the context.
 And answer according to the language of the user's question.
 
 Given the context information, answer the query.
-Query: [query]"""
+Query: [query]
+"""
 
 RAG_TEMPLATE = PersistentConfig(
     "RAG_TEMPLATE",

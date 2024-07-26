@@ -1058,7 +1058,6 @@ def store_doc(
     user=Depends(get_current_user),
 ):
     # "https://www.gutenberg.org/files/1727/1727-h/1727-h.htm"
-
     log.info(f"file.content_type: {file.content_type}")
     try:
         unsanitized_filename = file.filename

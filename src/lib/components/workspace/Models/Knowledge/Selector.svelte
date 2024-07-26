@@ -15,6 +15,8 @@
 
 	let items = [];
 
+	$: console.log(knowledge)
+	$: console.log(items)
 	onMount(() => {
 		let collections = [
 			...($documents.length > 0

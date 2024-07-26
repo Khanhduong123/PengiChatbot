@@ -45,27 +45,22 @@ async def get_documents(user=Depends(get_current_user)):
 
 @router.post("/create", response_model=Optional[DocumentResponse])
 async def create_new_doc(form_data: DocumentForm, user=Depends(get_admin_user)):
-    doc = Documents.get_doc_by_name(form_data.name)
-    if doc == None:
-        doc = Documents.insert_new_doc(user.id, form_data)
+    
+    doc = Documents.insert_new_doc(user.id, form_data)  
 
-        if doc:
-            return DocumentResponse(
-                **{
-                    **doc.model_dump(),
-                    "content": json.loads(doc.content if doc.content else "{}"),
-                }
-            )
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=ERROR_MESSAGES.FILE_EXISTS,
-            )
+    if doc:
+        return DocumentResponse(
+            **{
+                **doc.model_dump(),
+                "content": json.loads(doc.content if doc.content else "{}"),
+            }
+        )
     else:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=ERROR_MESSAGES.NAME_TAG_TAKEN,
+            detail=ERROR_MESSAGES.FILE_EXISTS,
         )
+
 
 
 ############################

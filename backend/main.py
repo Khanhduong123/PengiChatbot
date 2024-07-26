@@ -52,6 +52,7 @@ from apps.webui.models.tools import Tools
 from apps.webui.utils import load_toolkit_module_by_id
 
 
+from apps.webui.models.chats import Chats
 from utils.utils import (
     get_admin_user,
     get_verified_user,
@@ -348,36 +349,6 @@ class ChatCompletionMiddleware(BaseHTTPMiddleware):
 
                 print(f"tool_context: {context}")
 
-            # TODO
-            # get relevant document
-
-            # generate RAG completions
-
-            docs = [
-                DocumentResponse(
-                    **{
-                        **doc.model_dump(),
-                        "content": json.loads(doc.content if doc.content else "{}"),
-                    }
-                )
-                for doc in Documents.get_docs()
-            ]
-            collection_names = []
-            for doc in docs:
-                collection_names.append(doc.collection_name)
-            result = [
-                {
-                    "collection_names": doc.collection_name,
-                    "name": "All Documents",
-                    "title": "Tất cả tài liệu",
-                    "type": "collection",
-                    "upload_status": True,
-                }
-                for doc in docs
-            ]
-            # generate RAG completions
-            data["docs"] = result
-
             # If docs field is present, generate RAG completions
             if "docs" in data:
                 data = {**data}
@@ -395,14 +366,26 @@ class ChatCompletionMiddleware(BaseHTTPMiddleware):
                     context += ("\n" if context != "" else "") + rag_context
 
                 del data["docs"]
-                log.info(f"rag_context: {rag_context}, citations: {citations}")
 
+            log.info("CHAT ID")
+            log.info(data.get("test_id"))
             if context != "":
+                chat=Chats.get_chat_by_id_and_user_id(data.get("test_id"), user.id)
+                chat = json.loads(chat.chat)
+                history = chat["history"]
+                formatHistory = {}
+                formatHistory["messages"] = {}
+                whitelist = ["id", "parentId", "childrenIds", "content", "role", "annotation"]
+                for key, value in history["messages"].items():
+                    log.info(f"Key: {key}, Value: {value}")
+                    whitelisted_value = {k: v for k, v in value.items() if k in whitelist}
+                    formatHistory["messages"][key] = whitelisted_value
+                    
+                log.info(f"formatHistory: {formatHistory}")
+                
                 system_prompt = rag_template(
-                    rag_app.state.config.RAG_TEMPLATE, context, prompt
+                    rag_app.state.config.RAG_TEMPLATE, context, json.dumps(formatHistory), prompt
                 )
-
-                print(system_prompt)
 
                 data["messages"] = add_or_update_system_message(
                     f"\n{system_prompt}", data["messages"]
@@ -459,6 +442,9 @@ app.add_middleware(ChatCompletionMiddleware)
 
 
 def filter_pipeline(payload, user):
+    if "chat_id" in payload:
+            payload["test_id"] = payload.get("chat_id",None)
+    
     user = {"id": user.id, "name": user.name, "role": user.role}
     model_id = payload["model"]
     filters = [
@@ -520,7 +506,6 @@ def filter_pipeline(payload, user):
 
             else:
                 pass
-
     if "pipeline" not in app.state.MODELS[model_id]:
         if "chat_id" in payload:
             del payload["chat_id"]
@@ -548,6 +533,7 @@ class PipelineMiddleware(BaseHTTPMiddleware):
             user = get_current_user(
                 get_http_authorization_cred(request.headers.get("Authorization"))
             )
+      
             data = filter_pipeline(data, user)
 
             modified_body_bytes = json.dumps(data).encode("utf-8")

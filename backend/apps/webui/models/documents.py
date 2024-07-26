@@ -23,8 +23,8 @@ log.setLevel(SRC_LOG_LEVELS["MODELS"])
 
 
 class Document(Model):
-    collection_name = CharField(unique=True)
-    name = CharField(unique=True)
+    collection_name = CharField()
+    name = CharField()
     title = TextField()
     filename = TextField()
     content = TextField(null=True)

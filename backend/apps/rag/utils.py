@@ -150,7 +150,7 @@ def query_collection(
 ):
     results = []
     log.info(f"query_collections: {collection_names}")
-    for collection_name in collection_names:
+    for collection_name in collection_names[0]:
 
         try:
             log.info(f"query_collection: {collection_name}")
@@ -193,9 +193,10 @@ def query_collection_with_hybrid_search(
     return merge_and_sort_query_results(results, k=k, reverse=True)
 
 
-def rag_template(template: str, context: str, query: str):
+def rag_template(template: str, context: str, history: str, query: str):
     template = template.replace("[context]", context)
     template = template.replace("[query]", query)
+    template = template.replace("[history]", history)
     return template
 
 
@@ -268,9 +269,6 @@ def get_rag_context(
             )
         ]
 
-        log.info(f"collection_names_1: {collection_names}")
-        # collection_names = set(collection_names).difference(extracted_collections)
-        log.info(f"collection_names_2: {collection_names}")
         if not collection_names:
             log.debug(f"skipping {doc} as it has already been extracted")
             continue
@@ -298,8 +296,8 @@ def get_rag_context(
         except Exception as e:
             log.exception(e)
             context = None
-        log.info(f"context: {context}")
         if context:
+            log.info(f"context: {context}")
             relevant_contexts.append({**context, "source": doc})
 
         extracted_collections.extend(collection_names)
@@ -307,10 +305,7 @@ def get_rag_context(
     context_string = ""
 
     citations = []
-    log.info("======================================================================")
-    log.info(relevant_contexts)
-    log.info("======================================================================")
-    log.info(context)
+
     for context in relevant_contexts:
         try:
             if "documents" in context:
@@ -330,8 +325,6 @@ def get_rag_context(
             log.exception(e)
 
     context_string = context_string.strip()
-    log.info(f"context_string: {context_string}")
-    log.info(f"citations: {citations}")
     return context_string, citations
 
 

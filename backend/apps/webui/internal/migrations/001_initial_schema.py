@@ -84,8 +84,8 @@ def migrate_sqlite(migrator: Migrator, database: pw.Database, *, fake=False):
     @migrator.create_model
     class Document(pw.Model):
         id = pw.AutoField()
-        collection_name = pw.CharField(max_length=255, unique=True)
-        name = pw.CharField(max_length=255, unique=True)
+        collection_name = pw.CharField(max_length=255)
+        name = pw.CharField(max_length=255)
         title = pw.CharField()
         filename = pw.CharField()
         content = pw.TextField(null=True)
@@ -177,8 +177,8 @@ def migrate_external(migrator: Migrator, database: pw.Database, *, fake=False):
     @migrator.create_model
     class Document(pw.Model):
         id = pw.AutoField()
-        collection_name = pw.CharField(max_length=255, unique=True)
-        name = pw.CharField(max_length=255, unique=True)
+        collection_name = pw.CharField(max_length=255)
+        name = pw.CharField(max_length=255)
         title = pw.TextField()
         filename = pw.TextField()
         content = pw.TextField(null=True)

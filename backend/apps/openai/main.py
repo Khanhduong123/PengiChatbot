@@ -358,6 +358,7 @@ async def generate_chat_completion(
     model_id = form_data.get("model")
     model_info = Models.get_model_by_id(model_id)
 
+    log.info(F"model_info: {model_info}")
     if model_info:
         if model_info.base_model_id:
             payload["model"] = model_info.base_model_id
@@ -426,7 +427,9 @@ async def generate_chat_completion(
         if "max_tokens" not in payload:
             payload["max_tokens"] = 4000
         log.debug("Modified payload:", payload)
-
+        
+    if "test_id" in payload:
+        del payload["test_id"]
     # Convert the modified body back to JSON
     payload = json.dumps(payload)
 
@@ -444,6 +447,7 @@ async def generate_chat_completion(
     r = None
     session = None
     streaming = False
+
 
     try:
         session = aiohttp.ClientSession(trust_env=True)
