@@ -195,19 +195,21 @@
 			toast.success(`${model} download has been canceled`);
 		}
 	};
-	$: console.log(selectedModel)
+	$: console.log(selectedModel);
 </script>
+
 <div class="relative w-full">
 	<div
-	class="flex w-full text-left px-0.5 outline-none bg-transparent truncate text-lg font-semibold placeholder-gray-400 focus:outline-none"
->
-	{#if selectedModel}
-		{selectedModel.label}
-	{:else}
-		{placeholder}
-	{/if}
+		class="flex w-full text-left px-0.5 outline-none bg-transparent truncate text-lg font-semibold placeholder-gray-400 focus:outline-none"
+	>
+		{#if selectedModel}
+			{selectedModel.label}
+		{:else}
+			{placeholder}
+		{/if}
+	</div>
 </div>
-</div>
+
 <!-- <DropdownMenu.Root
 	bind:open={show}
 	onOpenChange={async () => {

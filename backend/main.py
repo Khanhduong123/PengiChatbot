@@ -42,7 +42,8 @@ from apps.audio.main import app as audio_app
 from apps.images.main import app as images_app
 from apps.rag.main import app as rag_app
 from apps.webui.main import app as webui_app
-
+from apps.documents.main import app as document_app
+from apps.chats.main import app as chat_app
 
 from pydantic import BaseModel
 from typing import List, Optional
@@ -65,7 +66,7 @@ from utils.task import (
 )
 from utils.misc import get_last_user_message, add_or_update_system_message
 
-from apps.rag.utils import get_rag_context, rag_template, query_doc
+from apps.rag.utils import get_rag_context, rag_template
 
 from config import (
     CONFIG_DATA,
@@ -74,7 +75,6 @@ from config import (
     WEBUI_AUTH,
     ENV,
     VERSION,
-    CHANGELOG,
     FRONTEND_BUILD_DIR,
     CACHE_DIR,
     STATIC_DIR,
@@ -131,7 +131,7 @@ print(
     |_|   |_____|_| \_|\____|___|  \____|_| |_/_/   \_\_| |____/ \___/ |_|
         
 v{VERSION} - PengiChatbot app support for admission.
-{f"Commit: {WEBUI_BUILD_HASH}" if WEBUI_BUILD_HASH != "pengi-build" else ""}
+{f"Commit: {WEBUI_BUILD_HASH}" if WEBUI_BUILD_HASH != "dev-build" else ""}
 https://github.com/Khanhduong123/PengiChatbot
 """
 )
@@ -347,8 +347,37 @@ class ChatCompletionMiddleware(BaseHTTPMiddleware):
                 del data["tool_ids"]
 
                 print(f"tool_context: {context}")
-         
-            
+
+            # TODO
+            # get relevant document
+
+            # generate RAG completions
+
+            docs = [
+                DocumentResponse(
+                    **{
+                        **doc.model_dump(),
+                        "content": json.loads(doc.content if doc.content else "{}"),
+                    }
+                )
+                for doc in Documents.get_docs()
+            ]
+            collection_names = []
+            for doc in docs:
+                collection_names.append(doc.collection_name)
+            result = [
+                {
+                    "collection_names": doc.collection_name,
+                    "name": "All Documents",
+                    "title": "Tất cả tài liệu",
+                    "type": "collection",
+                    "upload_status": True,
+                }
+                for doc in docs
+            ]
+            # generate RAG completions
+            data["docs"] = result
+
             # If docs field is present, generate RAG completions
             if "docs" in data:
                 data = {**data}
@@ -378,6 +407,7 @@ class ChatCompletionMiddleware(BaseHTTPMiddleware):
                 data["messages"] = add_or_update_system_message(
                     f"\n{system_prompt}", data["messages"]
                 )
+                return_citations = True
 
             modified_body_bytes = json.dumps(data).encode("utf-8")
 
@@ -584,6 +614,8 @@ app.mount("/openai", openai_app)
 app.mount("/images/api/v1", images_app)
 app.mount("/audio/api/v1", audio_app)
 app.mount("/rag/api/v1", rag_app)
+app.mount("/documents/api/v1", document_app)
+app.mount("/chats/api/v1", chat_app)
 
 app.mount("/api/v1", webui_app)
 
@@ -879,6 +911,7 @@ async def generate_chat_completions(form_data: dict, user=Depends(get_verified_u
         )
 
     model = app.state.MODELS[model_id]
+    print(model)
 
     if model["owned_by"] == "ollama":
         return await generate_ollama_chat_completion(
@@ -1364,31 +1397,6 @@ async def get_app_config():
     return {
         "version": VERSION,
     }
-
-
-@app.get("/api/changelog")
-async def get_app_changelog():
-    return {key: CHANGELOG[key] for idx, key in enumerate(CHANGELOG) if idx < 5}
-
-
-@app.get("/api/version/updates")
-async def get_app_latest_release_version():
-    try:
-        async with aiohttp.ClientSession(trust_env=True) as session:
-            async with session.get(
-                "https://api.github.com/repos/open-webui/open-webui/releases/latest"
-            ) as response:
-                response.raise_for_status()
-                data = await response.json()
-                latest_version = data["tag_name"]
-
-                return {"current": VERSION, "latest": latest_version[1:]}
-    except aiohttp.ClientError as e:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=ERROR_MESSAGES.RATE_LIMIT_EXCEEDED,
-        )
-
 
 @app.get("/manifest.json")
 async def get_manifest_json():

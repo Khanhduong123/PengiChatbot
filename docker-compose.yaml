@@ -22,7 +22,7 @@ services:
     image: khanhduong2003/pengi-chatbot
     container_name: pengi-chatbot
     volumes:
-      - pengi-frontend:/app/backend/data
+      - pengi-data:/app/backend/data
     depends_on:
       - ollama
     ports:
@@ -36,4 +36,4 @@ services:
 
 volumes:
   ollama: {}
-  pengi-frontend: {}
+  pengi-data: {}

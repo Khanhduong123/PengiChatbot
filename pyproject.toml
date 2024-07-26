@@ -1,88 +1,126 @@
 [project]
-name = "open-webui"
-description = "Open WebUI (Formerly Ollama WebUI)"
+name = "Pengi-Chatbot"
+description = "Pengi-Chatbot"
 authors = [
-    { name = "Timothy Jaeryang Baek", email = "tim@openwebui.com" }
+    { name = "Anh Vũ", email = "truonghoanganhvu04@gmail.com" }
 ]
-license = { file = "LICENSE" }
+
 dependencies = [
+    # Web frameworks
     "fastapi==0.111.0",
     "uvicorn[standard]==0.22.0",
-    "pydantic==2.7.1",
+    "pydantic==2.8.2",
     "python-multipart==0.0.9",
-
     "Flask==3.0.3",
     "Flask-Cors==4.0.1",
 
-    "python-socketio==5.11.2",
+    # Authentication and Security
     "python-jose==3.3.0",
     "passlib[bcrypt]==1.7.4",
+    "argon2-cffi==23.1.0",
+    "PyJWT[crypto]==2.8.0",
+    "authlib==1.3.1",
 
-    "requests==2.32.2",
+    # SocketIO
+    "python-socketio==5.11.3",
+
+    # HTTP and Requests
+    "requests==2.32.3",
     "aiohttp==3.9.5",
-    "peewee==3.17.5",
+
+    # Databases
+    "sqlalchemy==2.0.31",
+    "alembic==1.13.2",
+    "peewee==3.17.6",
     "peewee-migrate==1.12.2",
     "psycopg2-binary==2.9.9",
-    "PyMySQL==1.1.0",
-    "bcrypt==4.1.3",
+    "PyMySQL==1.1.1",
+    "pymongo",
+    "redis",
 
+    # AWS
     "boto3==1.34.110",
 
-    "argon2-cffi==23.1.0",
+    # Scheduling
     "APScheduler==3.10.4",
+
+    # OpenAI and AI related
+    "openai",
+    "anthropic",
     "google-generativeai==0.5.4",
-
-    "langchain==0.2.0",
-    "langchain-community==0.2.0",
-    "langchain-chroma==0.1.1",
-
+    "tiktoken",
+    "langchain==0.2.6",
+    "langchain-community==0.2.6",
+    "langchain-chroma==0.1.2",
     "fake-useragent==1.5.1",
-    "chromadb==0.5.0",
-    "sentence-transformers==2.7.0",
+    "chromadb==0.5.4",
+    "sentence-transformers==3.0.1",
+
+    # File Handling
     "pypdf==4.2.0",
     "docx2txt==0.8",
-    "unstructured==0.14.0",
+    "python-pptx==0.6.23",
+    "unstructured==0.14.10",
     "Markdown==3.6",
     "pypandoc==1.13",
     "pandas==2.2.2",
-    "openpyxl==3.1.2",
+    "openpyxl==3.1.5",
     "pyxlsb==1.0.10",
     "xlrd==2.0.1",
     "validators==0.28.1",
 
-    "opencv-python-headless==4.9.0.80",
+    # System Utilities
+    "psutil",
+
+    # Computer Vision
+    "opencv-python-headless==4.10.0.84",
     "rapidocr-onnxruntime==1.3.22",
 
+    # PDF Generation
     "fpdf2==2.7.9",
+
+    # Text Ranking
     "rank-bm25==0.2.2",
 
+    # Whisper AI
     "faster-whisper==1.0.2",
 
-    "PyJWT[crypto]==2.8.0",
-
+    # Linting and Formatting
     "black==24.4.2",
-    "langfuse==2.33.0",
+    "isort==5.12.0",
+
+    # Language tools
+    "langfuse==2.38.0",
     "youtube-transcript-api==0.6.2",
     "pytube==15.0.0",
+
+    # File parsing and utilities
     "extract_msg",
     "pydub",
-    "duckduckgo-search~=6.1.5"
+    "duckduckgo-search~=6.1.12",
 
+    # Docker and Testing
+    "docker~=7.1.0",
+    "pytest~=8.2.2",
+    "pytest-docker~=3.1.1"
 ]
 readme = "README.md"
 requires-python = ">= 3.11, < 3.12.0a1"
 dynamic = ["version"]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
-    "Topic :: Communications :: Chat",
-    "Topic :: Multimedia",
-]
+
+[tool.black]
+exclude = '''
+/(
+    \.venv        # Exclude .venv directory
+  | conda         # Exclude conda directory
+)/
+'''
+
+[tool.isort]
+skip = [".venv", "conda"]
 
 [project.scripts]
-open-webui = "open_webui:app"
+pengi-webui = "pengi_webui:app"
 
 [build-system]
 requires = ["hatchling"]
@@ -114,4 +152,4 @@ exclude = [
     "webui.db",
     "chroma.sqlite3",
 ]
-force-include = { "CHANGELOG.md" = "open_webui/CHANGELOG.md", build = "open_webui/frontend" }
+force-include = { "build" = "pengi_webui/frontend" }

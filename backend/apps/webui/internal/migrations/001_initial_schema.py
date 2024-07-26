@@ -80,7 +80,25 @@ def migrate_sqlite(migrator: Migrator, database: pw.Database, *, fake=False):
 
         class Meta:
             table_name = "chatidtag"
+    @migrator.create_model
+    class DocumentQdrant(pw.Model):
+        file_name = pw.TextField()
+        file_type = pw.TextField()
+        file_status = pw.BooleanField()
+        user_id = pw.CharField()
+        created_at = pw.DateTimeField()
 
+        class Meta:
+            table_name = "document_qdrant"
+    @migrator.create_model
+    class ReferenceDocumentQdrant(pw.Model):
+        content = pw.TextField(null=True)
+        document_name = pw.CharField(unique=True)
+        page = pw.IntegerField()
+        message_id = pw.IntegerField()
+        document_id = pw.IntegerField()
+        class Meta:
+            table_name = "reference_document_qdrant"
     @migrator.create_model
     class Document(pw.Model):
         id = pw.AutoField()
@@ -173,7 +191,26 @@ def migrate_external(migrator: Migrator, database: pw.Database, *, fake=False):
 
         class Meta:
             table_name = "chatidtag"
+    @migrator.create_model
+    class DocumentQdrant(pw.Model):
+        file_name = pw.TextField()
+        file_hash = pw.TextField()
+        file_type = pw.TextField()
+        file_status = pw.BooleanField()
+        user_id = pw.CharField()
+        created_at = pw.DateTimeField()
 
+        class Meta:
+            table_name = "document_qdrant"
+    @migrator.create_model
+    class ReferenceDocumentQdrant(pw.Model):
+        content = pw.TextField(null=True)
+        document_name = pw.CharField(unique=True)
+        page = pw.IntegerField()
+        message_id = pw.IntegerField()
+        document_id = pw.IntegerField()
+        class Meta:
+            table_name = "reference_document_qdrant"
     @migrator.create_model
     class Document(pw.Model):
         id = pw.AutoField()

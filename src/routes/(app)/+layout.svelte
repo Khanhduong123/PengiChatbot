@@ -26,7 +26,6 @@
 		documents,
 		tags,
 		banners,
-		showChangelog,
 		config,
 		showCallOverlay,
 		tools
@@ -34,7 +33,6 @@
 
 	import SettingsModal from '$lib/components/chat/SettingsModal.svelte';
 	import Sidebar from '$lib/components/layout/Sidebar.svelte';
-	import ChangelogModal from '$lib/components/ChangelogModal.svelte';
 	import AccountPending from '$lib/components/layout/Overlay/AccountPending.svelte';
 
 	const i18n = getContext('i18n');
@@ -166,10 +164,6 @@
 				}
 			});
 
-			if ($user.role === 'admin') {
-				showChangelog.set(localStorage.version !== $config.version);
-			}
-
 			await tick();
 		}
 
@@ -178,7 +172,6 @@
 </script>
 
 <SettingsModal bind:show={$showSettings} />
-<!-- <ChangelogModal bind:show={$showChangelog} /> -->
 
 <div class="app relative">
 	<div

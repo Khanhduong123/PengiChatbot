@@ -34,7 +34,7 @@ from langchain_community.document_loaders import (
     UnstructuredPowerPointLoader,
     YoutubeLoader,
     OutlookMessageLoader,
-    UnstructuredFileLoader
+    UnstructuredFileLoader,
 )
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
@@ -925,7 +925,9 @@ def store_docs_in_vector_db(docs, collection_name, overwrite: bool = False) -> b
                     log.info(f"deleting existing collection {collection_name}")
                     CHROMA_CLIENT.delete_collection(name=collection_name)
 
-        collection = CHROMA_CLIENT.get_or_create_collection(name=collection_name,metadata={"hnsw:space": "cosine"})
+        collection = CHROMA_CLIENT.get_or_create_collection(
+            name=collection_name, metadata={"hnsw:space": "cosine"}
+        )
 
         embedding_func = get_embedding_function(
             app.state.config.RAG_EMBEDDING_ENGINE,
@@ -955,7 +957,7 @@ def store_docs_in_vector_db(docs, collection_name, overwrite: bool = False) -> b
             return True
 
         return False
-    
+
 
 def read_split_document(file_path):
     # Extract the document name from the file path
@@ -971,7 +973,6 @@ def read_split_document(file_path):
 
     # Load and split the document using the selected loader
     documents = loader.load_and_split()
-
 
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=CHUNK_SIZE,
@@ -990,6 +991,8 @@ def read_split_document(file_path):
     ]
 
     return list_chunks
+
+
 async def save_document(file):
     # Construct the full file path based on the settings
     file_path = f"{UPLOAD_DIR}/{file.filename}"
@@ -1002,6 +1005,7 @@ async def save_document(file):
         f.write(contents)
 
     return file_path
+
 
 def get_loader(filename: str, file_content_type: str, file_path: str):
     file_ext = filename.split(".")[-1].lower()
@@ -1109,9 +1113,7 @@ async def store_doc(
     log.info(f"file.content_type: {file.content_type}")
     try:
         file_path = await save_document(file=file)
-        list_chunks = read_split_document(
-            file_path=file_path
-        )
+        list_chunks = read_split_document(file_path=file_path)
         # unsanitized_filename = file.filename
         # filename = os.path.basename(unsanitized_filename)
 

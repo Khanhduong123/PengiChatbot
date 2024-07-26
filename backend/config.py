@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 from typing import TypeVar, Generic, Union
 from pydantic import BaseModel
 from typing import Optional
+from pydantic_settings import BaseSettings
 
 from pathlib import Path
 import json
@@ -98,7 +99,7 @@ try:
     PACKAGE_DATA = json.loads((BASE_DIR / "package.json").read_text())
 except:
     try:
-        PACKAGE_DATA = {"version": importlib.metadata.version("open-webui")}
+        PACKAGE_DATA = {"version": importlib.metadata.version("pengi-webui")}
     except importlib.metadata.PackageNotFoundError:
         PACKAGE_DATA = {"version": "0.0.0"}
 
@@ -122,49 +123,6 @@ def parse_section(section):
 
         items.append({"title": title, "content": content, "raw": raw_html})
     return items
-
-
-try:
-    changelog_path = BASE_DIR / "CHANGELOG.md"
-    with open(str(changelog_path.absolute()), "r", encoding="utf8") as file:
-        changelog_content = file.read()
-
-except:
-    changelog_content = (pkgutil.get_data("open_webui", "CHANGELOG.md") or b"").decode()
-
-
-# Convert markdown content to HTML
-html_content = markdown.markdown(changelog_content)
-
-# Parse the HTML content
-soup = BeautifulSoup(html_content, "html.parser")
-
-# Initialize JSON structure
-changelog_json = {}
-
-# Iterate over each version
-for version in soup.find_all("h2"):
-    version_number = version.get_text().strip().split(" - ")[0][1:-1]  # Remove brackets
-    date = version.get_text().strip().split(" - ")[1]
-
-    version_data = {"date": date}
-
-    # Find the next sibling that is a h3 tag (section title)
-    current = version.find_next_sibling()
-
-    while current and current.name != "h2":
-        if current.name == "h3":
-            section_title = current.get_text().lower()  # e.g., "added", "fixed"
-            section_items = parse_section(current.find_next_sibling("ul"))
-            version_data[section_title] = section_items
-
-        # Move to the next element
-        current = current.find_next_sibling()
-
-    changelog_json[version_number] = version_data
-
-
-CHANGELOG = changelog_json
 
 
 ####################################
@@ -1086,3 +1044,27 @@ AUDIO_TTS_VOICE = PersistentConfig(
 ####################################
 
 DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///{DATA_DIR}/webui.db")
+
+
+####################################
+# MY_CONFIG
+####################################
+basedir = os.path.abspath(os.path.dirname(__file__))
+class Settings(BaseSettings):
+    # App config
+    APP_NAME: str = "Pengi Chatbot"
+    APP_ENV: str = "develop"
+
+    # Logging setting
+    DATE_FMT: str = "%Y-%m-%d %H:%M:%S"
+    LOG_DIR: str = f"{basedir}/logs/api.log"
+    FILE_LOG: bool = os.getenv("FILE_LOG", True)
+
+    # Qdrant configuration
+    QDRANT_URL: str = os.getenv("QDRANT_URL", "http://localhost:6334")
+    QDRANT_KEY: Optional[str] = os.getenv("QDRANT_KEY")
+
+    # Database configuration
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "mongodb://localhost:27017")
+    
+settings = Settings()

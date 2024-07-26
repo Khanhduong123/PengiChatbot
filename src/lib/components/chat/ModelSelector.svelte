@@ -32,14 +32,13 @@
 			$models.map((m) => m.id).includes(model) ? model : ''
 		);
 	}
-	$: models.subscribe(data=>console.log(data))
+	$: models.subscribe((data) => console.log(data));
 
-	$:console.log(selectedModels)
+	$: console.log(selectedModels);
 </script>
 
 <div class="flex flex-col w-full items-center md:items-start">
 	{#each selectedModels as selectedModel, selectedModelIdx}
-
 		<div class="flex w-full max-w-fit">
 			<div class="overflow-hidden w-full">
 				<div class="mr-1 max-w-full">
@@ -54,10 +53,6 @@
 					/>
 				</div>
 			</div>
-
-			
 		</div>
 	{/each}
 </div>
-
-

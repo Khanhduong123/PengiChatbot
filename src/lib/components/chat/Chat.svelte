@@ -45,9 +45,9 @@
 		getTagsById,
 		updateChatById
 	} from '$lib/apis/chats';
-	import { generateOpenAIChatCompletion } from '$lib/apis/openai';
+	import { generateOpenAIChatCompletion, generateChat } from '$lib/apis/openai';
 	import { runWebSearch } from '$lib/apis/rag';
-	import { createOpenAITextStream } from '$lib/apis/streaming';
+	import { createOpenAITextStream, handleStream, processStream } from '$lib/apis/streaming';
 	import { queryMemory } from '$lib/apis/memories';
 	import { getUserSettings } from '$lib/apis/users';
 	import { chatCompleted, generateTitle, generateSearchQuery } from '$lib/apis';
@@ -147,7 +147,7 @@
 			messages: {},
 			currentId: null
 		};
-		selectedModels = $config?.default_models.split(',')
+		selectedModels = $config?.default_models.split(',');
 		// if ($page.url.searchParams.get('models')) {
 		// 	selectedModels = $page.url.searchParams.get('models')?.split(',');
 		// } else if ($settings?.models) {
@@ -861,6 +861,9 @@
 	};
 
 	const sendPromptOpenAI = async (model, userPrompt, responseMessageId, _chatId) => {
+		console.log("sendPromptOpenAI")
+		console.log(userPrompt)
+		console.log(chats)
 		let _response = null;
 		const responseMessage = history.messages[responseMessageId];
 
@@ -961,14 +964,29 @@
 				},
 				`${OPENAI_API_BASE_URL}`
 			);
+			// const [res_1, controller_1] = await generateChat(
+			// 	localStorage.token,
+			// 	{
+			// 		chat_id: $chatId,
+			// 		question: userPrompt
+			// 	},
+			// );
 
 			// Wait until history/message have been updated
 			await tick();
 
 			scrollToBottom();
 
+			// if (res_1 && res_1.ok && res_1.body) {
+			// 	console.log('res', res_1);
+			// 	const textStream = await processStream(res_1.body);
+			// 	for await (const chunk of textStream) {
+			// 		const { data } = chunk;
+			// 		console.log(`Chatting: ${data}`)
+			// 	}
+			// }
 			if (res && res.ok && res.body) {
-				console.log('res', res);
+				
 				const textStream = await createOpenAITextStream(res.body, $settings.splitLargeChunks);
 				let lastUsage = null;
 

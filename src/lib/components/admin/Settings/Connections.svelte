@@ -294,7 +294,7 @@
 										</Tooltip>
 									</div>
 								</div>
-								
+
 								<!-- <div class=" mb-1 text-xs text-gray-400 dark:text-gray-500">
 									{$i18n.t('WebUI will make requests to')}
 									<span class=" text-gray-200">'{url}/models'</span>

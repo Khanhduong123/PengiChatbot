@@ -42,7 +42,6 @@ def query_doc(
             query_embeddings=[query_embeddings],
             n_results=k,
         )
-        
 
         log.info(f"query_doc:result {result}")
         return result
@@ -269,9 +268,6 @@ def get_rag_context(
             )
         ]
 
-        log.info(f"collection_names_1: {collection_names}")
-        # collection_names = set(collection_names).difference(extracted_collections)
-        log.info(f"collection_names_2: {collection_names}")
         if not collection_names:
             log.debug(f"skipping {doc} as it has already been extracted")
             continue
@@ -308,10 +304,7 @@ def get_rag_context(
     context_string = ""
 
     citations = []
-    log.info("======================================================================")
-    log.info(relevant_contexts)
-    log.info("======================================================================")
-    log.info(context)
+
     for context in relevant_contexts:
         try:
             if "documents" in context:

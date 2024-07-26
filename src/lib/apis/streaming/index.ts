@@ -19,6 +19,25 @@ type ResponseUsage = {
 	/** Sum of the above two fields */
 	total_tokens: number;
 };
+export async function* handleStream(response: ReadableStream<Uint8Array>) {
+	const reader = response.getReader();
+	const decoder = new TextDecoder('utf-8');
+
+	while (true) {
+		const { done, value } = await reader.read();
+		if (done) break;
+		const chunk = decoder.decode(value, { stream: true });
+		yield { data: chunk }; // Yield each chunk of the streamed response
+	}
+}
+
+// Example of how to use the handleStream generator function
+export async function processStream(response: ReadableStream<Uint8Array>) {
+	return handleStream(response);
+	// for await (const chunk of handleStream(response)) {
+	// 	console.log(chunk.data); // Process each chunk
+	// }
+}
 
 // createOpenAITextStream takes a responseBody with a SSE response,
 // and returns an async generator that emits delta updates with large deltas chunked into random sized chunks

@@ -11,7 +11,7 @@ ARG USE_CUDA_VER=cu121
 # IMPORTANT: If you change the embedding model (sentence-transformers/all-MiniLM-L6-v2) and vice versa, you aren't able to use RAG Chat with your previous documents loaded in the WebUI! You need to re-embed them.
 ARG USE_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
 ARG USE_RERANKING_MODEL=""
-ARG BUILD_HASH=dev-build
+ARG BUILD_HASH=pengi-build
 # Override at your own risk - non-root configurations are untested
 ARG UID=0
 ARG GID=0
@@ -45,12 +45,12 @@ ARG GID
 ## Basis ##
 ENV ENV=prod \
     PORT=9999
-    # pass build args to the build
-    # USE_OLLAMA_DOCKER=${USE_OLLAMA} \
-    # USE_CUDA_DOCKER=${USE_CUDA} \
-    # USE_CUDA_DOCKER_VER=${USE_CUDA_VER} \
-    # USE_EMBEDDING_MODEL_DOCKER=${USE_EMBEDDING_MODEL} \
-    # USE_RERANKING_MODEL_DOCKER=${USE_RERANKING_MODEL}
+# pass build args to the build
+# USE_OLLAMA_DOCKER=${USE_OLLAMA} \
+# USE_CUDA_DOCKER=${USE_CUDA} \
+# USE_CUDA_DOCKER_VER=${USE_CUDA_VER} \
+# USE_EMBEDDING_MODEL_DOCKER=${USE_EMBEDDING_MODEL} \
+# USE_RERANKING_MODEL_DOCKER=${USE_RERANKING_MODEL}
 
 ## Basis URL Config ##
 ENV OLLAMA_BASE_URL="/ollama" \
@@ -142,7 +142,6 @@ RUN pip3 install uv && \
 
 # copy built frontend files
 COPY --chown=$UID:$GID --from=build /app/build /app/build
-COPY --chown=$UID:$GID --from=build /app/CHANGELOG.md /app/CHANGELOG.md
 COPY --chown=$UID:$GID --from=build /app/package.json /app/package.json
 
 # copy backend files

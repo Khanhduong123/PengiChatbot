@@ -39,12 +39,12 @@ if [ -n "$SPACE_ID" ]; then
     WEBUI_SECRET_KEY="$WEBUI_SECRET_KEY" uvicorn main:app --host "$HOST" --port "$PORT" --forwarded-allow-ips '*' &
     webui_pid=$!
     echo "Waiting for webui to start..."
-    while ! curl -s http://localhost:9999/health > /dev/null; do
+    while ! curl -s http://localhost:$PORT/health > /dev/null; do
       sleep 1
     done
     echo "Creating admin user..."
     curl \
-      -X POST "http://localhost:9999/api/v1/auths/signup" \
+      -X POST "http://localhost:$PORT/api/v1/auths/signup" \
       -H "accept: application/json" \
       -H "Content-Type: application/json" \
       -d "{ \"email\": \"${ADMIN_USER_EMAIL}\", \"password\": \"${ADMIN_USER_PASSWORD}\", \"name\": \"Admin\" }"
