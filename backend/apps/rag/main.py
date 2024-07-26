@@ -924,7 +924,7 @@ def store_docs_in_vector_db(docs, collection_name, overwrite: bool = False) -> b
                     log.info(f"deleting existing collection {collection_name}")
                     CHROMA_CLIENT.delete_collection(name=collection_name)
 
-        collection = CHROMA_CLIENT.create_collection(name=collection_name)
+        collection = CHROMA_CLIENT.create_collection(name=collection_name,metadata={"hnsw":"cosine"})
 
         embedding_func = get_embedding_function(
             app.state.config.RAG_EMBEDDING_ENGINE,
