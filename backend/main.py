@@ -75,7 +75,6 @@ from config import (
     WEBUI_AUTH,
     ENV,
     VERSION,
-    CHANGELOG,
     FRONTEND_BUILD_DIR,
     CACHE_DIR,
     STATIC_DIR,
@@ -1381,12 +1380,6 @@ async def get_app_config():
     return {
         "version": VERSION,
     }
-
-
-@app.get("/api/changelog")
-async def get_app_changelog():
-    return {key: CHANGELOG[key] for idx, key in enumerate(CHANGELOG) if idx < 5}
-
 
 @app.get("/api/version/updates")
 async def get_app_latest_release_version():

@@ -1,7 +1,11 @@
 import csv
-import openai
+from openai import OpenAI
 from dotenv import load_dotenv
 load_dotenv()
+
+
+client = OpenAI()
+
 def read_data(file_path):
     with open(file_path, mode='r', encoding='utf-8') as file:
         reader = csv.reader(file)
@@ -34,7 +38,7 @@ def create_prompt(data_string):
 def get_chatgpt_response(prompt):
     # openai.api_key = "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"
     
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {"role": "system", "content": ""},
@@ -43,7 +47,7 @@ def get_chatgpt_response(prompt):
         
     )
     
-    return response.choices[0].message['content'].strip()
+    return response.choices[0].message.content.strip()
 
 # def generate_output(comparison_result):
 #     head,data = read_data('D:\\software\\Hackathon\\Challenge_3\\data\\data.csv')

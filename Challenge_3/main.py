@@ -6,6 +6,7 @@ from predict import  get_chatgpt_response, create_prompt, create_data_string
 # from compare import get_fields_of_study
 import csv
 
+
 app = FastAPI()
 
 class UserInput(BaseModel):
@@ -16,9 +17,11 @@ async def process_input(user_input: UserInput):
     #Extract fields of study from user input
     fields_of_study = get_fields_of_study()
     extracted_fields = extract_fields_of_study(user_input.input_text, fields_of_study)
-    
+    print(f"Asnwer: {extracted_fields}")
     #Compare extracted fields with data
-    comparison_result = compare_fields(extracted_fields)
+    comparison_result = ""
+    if extracted_fields.lower() != "no answer":
+        comparison_result = compare_fields(extracted_fields)
     
     # #Generate final output
     # final_output = generate_output(comparison_result)
@@ -39,7 +42,7 @@ def get_fields_of_study():
 
 @app.get("/visualize/")
 async def visualize_data():
-    data_path = 'D:\\software\\Hackathon\\Challenge_3\\data\\data.csv'
+    data_path = r'C:\Code\PengiChatbot\Challenge_3\data\data.csv'
     with open(data_path, mode='r', encoding='utf-8') as file:
         reader = csv.reader(file)
         header = next(reader)
