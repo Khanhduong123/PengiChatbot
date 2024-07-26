@@ -4,7 +4,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 def compare_fields(extracted_fields):
 
-    data_path = r'D:\software\Hackathon\Challenge_3\data\data.csv'
+    data_path = r'C:\Code\PengiChatbot\Challenge_3\data\data.csv'
 
     with open(data_path, mode='r', encoding='utf-8') as file:
         reader = csv.reader(file)

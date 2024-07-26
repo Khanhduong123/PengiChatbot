@@ -1,8 +1,5 @@
 import openai
-import os
 
-# Set the API key
-openai.api_key = "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"
 
 # Define the function that extracts fields of study from the user input
 def extract_fields_of_study(user_input, fields_of_study):
