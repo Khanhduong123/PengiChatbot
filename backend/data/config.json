@@ -53,7 +53,7 @@
 				"content": "Check the following sentence for grammar and clarity: \"[sentence]\". Rewrite it for better readability while maintaining its original meaning."
 			}
 		],
-		"default_models": "pengi",
+		"default_models": "pengiv2",
 		"user_permissions": {
 			"chat": {
 				"deletion": true
@@ -79,7 +79,7 @@
 	"model_filter": {
 		"enable": true,
 		"list": [
-			"pengi"
+			"pengiv2"
 		]
 	},
 	"webhook_url": "",
@@ -98,7 +98,7 @@
 		"pdf_extract_images": false,
 		"chunk_size": 1500,
 		"chunk_overlap": 100,
-		"template": "Use the following context as your learned knowledge, inside <context></context> XML tags.\n<context>\n    [context]\n</context>\n\nUse the following history as your relearned knowledge base on context, inside <history></history> XML tags.\n<history>\n    [history]\n</history>\n\nWhen answer to user:\n- If message in history have property annotation with rating equal -1, it means your answer is bad. And you will answer it again base on the reason and comment. And if you don't have the reason and comment in the annotation, you still have to answer it again.\n- If you don't know, just say that you don't know.\n- If you don't know when you are not sure, ask for clarification.\nAvoid mentioning that you obtained the information from the context.\nAnd answer according to the language of the user's question.\n\nGiven the context information, answer the query.\nQuery: [query]",
+		"template": "Use the following context as your learned knowledge, inside <context></context> XML tags.\n<context>\n    [context]\n</context>\n\nUse the following history as your relearned knowledge base on context, inside <history></history> XML tags.\n<history>\n    [history]\n</history>\n\nWhen answer to user:\n- If message in history have property annotation with rating equal -1, it means your answer is bad. And you will answer it again base on the reason and comment. And if you don't have the reason and comment in the annotation, you still have to answer it again with new answer.\n- If you don't know, just say that you don't know.\n- If you don't know when you are not sure, ask for clarification.\nAvoid mentioning that you obtained the information from the context.\nAnd answer according to the language of the user's question.\n\nGiven the context information, answer the query.\nQuery: [query]",
 		"top_k": 3,
 		"relevance_threshold": 0.0,
 		"enable_hybrid_search": false

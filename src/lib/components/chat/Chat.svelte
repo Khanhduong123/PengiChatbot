@@ -888,6 +888,17 @@
 		scrollToBottom();
 
 		try {
+			const res_test = await fetch('http://localhost:8000/process/', {
+				method: 'POST',
+				headers: {
+					accept: 'application/json',
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					input_text: userPrompt
+				})
+			});
+			console.log(await res_test.json());
 			const [res, controller] = await generateOpenAIChatCompletion(
 				localStorage.token,
 				{
