@@ -166,9 +166,9 @@
 				}
 			});
 
-			if ($user.role === 'admin') {
-				showChangelog.set(localStorage.version !== $config.version);
-			}
+			// if ($user.role === 'admin') {
+			// 	showChangelog.set(localStorage.version !== $config.version);
+			// }
 
 			await tick();
 		}
@@ -242,7 +242,10 @@
 			{/if}
 
 			<Sidebar />
+
 			<slot />
+
+			<!-- <slot /> -->
 		{/if}
 	</div>
 </div>

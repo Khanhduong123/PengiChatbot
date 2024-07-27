@@ -147,7 +147,7 @@
 			messages: {},
 			currentId: null
 		};
-		selectedModels = $config?.default_models.split(',')
+		selectedModels = $config?.default_models.split(',');
 		// if ($page.url.searchParams.get('models')) {
 		// 	selectedModels = $page.url.searchParams.get('models')?.split(',');
 		// } else if ($settings?.models) {
@@ -1209,11 +1209,7 @@
 <CallOverlay {submitPrompt} bind:files />
 
 {#if !chatIdProp || (loaded && chatIdProp)}
-	<div
-		class="h-screen max-h-[100dvh] {$showSidebar
-			? 'md:max-w-[calc(100%-260px)]'
-			: ''} w-full max-w-full flex flex-col"
-	>
+	<div class="h-screen max-h-[100dvh] {$showSidebar ? '' : ''} w-full max-w-full flex flex-col">
 		<Navbar
 			{title}
 			bind:selectedModels
@@ -1224,9 +1220,7 @@
 		/>
 
 		{#if $banners.length > 0 && messages.length === 0 && !$chatId && selectedModels.length <= 1}
-			<div
-				class="absolute top-[4.25rem] w-full {$showSidebar ? 'md:max-w-[calc(100%-260px)]' : ''}"
-			>
+			<div class="absolute top-[4.25rem] w-full {$showSidebar ? '' : ''}">
 				<div class=" flex flex-col gap-1 w-full">
 					{#each $banners.filter( (b) => (b.dismissible ? !JSON.parse(localStorage.getItem('dismissedBannerIds') ?? '[]').includes(b.id) : true) ) as banner}
 						<Banner

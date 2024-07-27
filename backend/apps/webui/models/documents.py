@@ -86,7 +86,7 @@ class DocumentsTable:
                 "timestamp": int(time.time()),
             }
         )
-
+        print(document)
         try:
             result = Document.create(**document.model_dump())
             if result:

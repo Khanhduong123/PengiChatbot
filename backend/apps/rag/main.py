@@ -924,7 +924,7 @@ def store_docs_in_vector_db(docs, collection_name, overwrite: bool = False) -> b
                     log.info(f"deleting existing collection {collection_name}")
                     CHROMA_CLIENT.delete_collection(name=collection_name)
 
-        collection = CHROMA_CLIENT.create_collection(name=collection_name,metadata={"hnsw":"cosine"})
+        collection = CHROMA_CLIENT.get_or_create_collection(name=collection_name,metadata={"hnsw":"cosine"})
 
         embedding_func = get_embedding_function(
             app.state.config.RAG_EMBEDDING_ENGINE,
@@ -1052,13 +1052,14 @@ def get_loader(filename: str, file_content_type: str, file_path: str):
 
 
 @app.post("/doc")
-def store_doc(
+async def store_doc(
     collection_name: Optional[str] = Form(None),
     file: UploadFile = File(...),
     user=Depends(get_current_user),
 ):
     # "https://www.gutenberg.org/files/1727/1727-h/1727-h.htm"
     log.info(f"file.content_type: {file.content_type}")
+    # collection_name = "document-collection"
     try:
         unsanitized_filename = file.filename
         filename = os.path.basename(unsanitized_filename)
@@ -1080,7 +1081,6 @@ def store_doc(
 
         try:
             result = store_data_in_vector_db(data, collection_name)
-
             if result:
                 return {
                     "status": True,
